@@ -38,6 +38,15 @@ class MainView(GUI):
                 message = filename
                 )
 
+        def adv_search():
+            _adv_search = tk.Tk()
+            _adv_search.geometry("100x100")
+            _adv_search_frame = ttk.Frame(_adv_search, padding = 10)
+            _adv_search_frame.grid()
+            en2 = ttk.Entry(_adv_search_frame).grid(row= 1, column= 0)
+            _adv_search.mainloop()
+
+
         try: main_window
         except NameError: main_window = tk.Tk()
         main_window.geometry("500x200")
@@ -49,7 +58,8 @@ class MainView(GUI):
         en1.grid(row= 1, column= 0)
 
         btn1 = tk.Button(main_window, text= "-->").grid(row=1, column=1, padx=10)
-        btn2 = tk.Button(main_window, text= "Advanced Search") #fixme
+        btn2 = tk.Button(main_window, text= "Advanced Search"
+                         ,command= adv_search) 
         btn2.grid(row=2, column = 0)
         btn3 = tk.Button(main_window, text ="Import dataset"
                          ,command= fileselect)  
@@ -62,14 +72,7 @@ class MainView(GUI):
     def search(controller):
         self.cntr.getResponse()
 
-    def adv_search():
-        _adv_search = tk.Tk()
-        _adv_search.geometry("100x100")
-        _adv_search_frame = ttk.Frame(_adv_search, padding = 10)
-        _adv_search_frame.grid()
-        en2 = ttk.Entry(advSearchFrame).grid(row= 1, column= 0)
-        _adv_search.mainloop()
-
+    
     
     
     
