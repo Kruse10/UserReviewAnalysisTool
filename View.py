@@ -7,11 +7,11 @@ from tkinter.messagebox import showinfo
 
 
 
-class MainView(ttk.Frame):
+class MainView():
     
     
-    def __init__(self, parent):
-        super().__init__()
+    def __init__(self):
+        
         
         try: main_window
         except NameError: main_window = tk.Tk()

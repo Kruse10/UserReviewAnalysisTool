@@ -5,7 +5,7 @@ import View
 import Controller
 
 
-class App(tk.Tk):
+class App():
     def __init__(self):
         super().__init__()
         
@@ -14,7 +14,7 @@ class App(tk.Tk):
         model = Model.DataModel()
 
         #create view
-        view = View.MainView(self)
+        view = View.MainView()
         
         controller = Controller.MainController(model, view)
         
