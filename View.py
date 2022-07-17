@@ -4,15 +4,40 @@ from tkinter import filedialog as fd
 from tkinter import StringVar
 from tkinter.messagebox import showinfo
 
+class GUI:
+    def fileselect():
+        filetype = (('text files', '*.txt'),('.csv files', '*.csv'),('all files', '*.*'))
+        filename = fd.askopenfilename(
+            title = 'open file',
+            initialdir= '/',
+            filetypes = filetype
+            )
+        
+        showinfo(
+            title = 'selected file',
+            message = filename
+            )
 
 
 
-class MainView():
+class MainView(GUI):
     
     
     def __init__(self):
         
+        def fileselect():
+            filetype = (('text files', '*.txt'),('.csv files', '*.csv'),('all files', '*.*'))
+            filename = fd.askopenfilename(
+                title = 'open file',
+                initialdir= '/',
+                filetypes = filetype
+                )
         
+            showinfo(
+                title = 'selected file',
+                message = filename
+                )
+
         try: main_window
         except NameError: main_window = tk.Tk()
         main_window.geometry("500x200")
@@ -26,8 +51,8 @@ class MainView():
         btn1 = tk.Button(main_window, text= "-->").grid(row=1, column=1, padx=10)
         btn2 = tk.Button(main_window, text= "Advanced Search") #fixme
         btn2.grid(row=2, column = 0)
-        btn3 = tk.Button(main_window, text ="Import dataset")
-                         #,command= fileselect)  fixme
+        btn3 = tk.Button(main_window, text ="Import dataset"
+                         ,command= fileselect)  
         btn3.grid(column= 0, pady= 5)
 
         ttk.Label(main_window, text= "datasets").grid(row=0, column=3)
@@ -45,21 +70,9 @@ class MainView():
         en2 = ttk.Entry(advSearchFrame).grid(row= 1, column= 0)
         _adv_search.mainloop()
 
-    def fileselect():
-        filetype = (('text files', '*.txt'),('.csv files', '*.csv'),('all files', '*.*'))
-        filename = fd.askopenfilename(
-            title = 'open file',
-            initialdir= '/',
-            filetypes = filetype
-            )
-        
-        showinfo(
-            title = 'selected file',
-            message = filename
-            )
     
     
-
+    
     
 
     def set_controller(self, controller):
