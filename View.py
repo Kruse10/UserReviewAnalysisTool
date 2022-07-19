@@ -56,6 +56,22 @@ class ASWindow(QMainWindow):
         #links = self.controller.get_adv_search(e1.get(), e2.get(), e3.get())
         pass
 
+class SelectWindow(QMainWindow):
+
+    def __init__(self, c):
+        super(MainView, self).__init__()
+
+        self.setGeometry(100, 100, 200, 120)
+        self.setWindowTitle("AdvancedSearch")
+        self.initUI()
+
+    def initUI():
+        pass
+
+    def select_link():
+        pass
+
+
 class MainView(QMainWindow): 
 
     def __init__(self, c):
@@ -103,8 +119,8 @@ class MainView(QMainWindow):
 
     def clicked(self):
         
-        self.links = self.controller.get_search(self.e1.text())
-        print(self.links)
+        links = self.controller.get_search(self.e1.text())
+        print(links)
 
 
         #self.lb1.addItems(self.links)
@@ -131,8 +147,11 @@ class MainView(QMainWindow):
     def advanced_search(self):
         self.w = ASWindow()
         self.w.show()
-
         
+    def select_link(self, l):
+        self.w = SelectWindow()
+        self.w.show()
+        return w.getlink()
         
 
     
