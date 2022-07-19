@@ -4,10 +4,10 @@ from requests_html import HTML
 from requests_html import HTMLSession
 
 class MainController:
-    def __init__(self, model, view):
+    def __init__(self, model):
         self.model = model
-        self.view = view
-
+    def set_view(self, v):
+        self.view = v
     def getResponse(query):
         try:
             session = HTMLSession()

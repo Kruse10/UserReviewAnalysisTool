@@ -1,9 +1,9 @@
-import tkinter as tk
+from PyQt5.QtWidgets import QApplication, QWidget as qa
 import re
 import Model
 import View
 import Controller
-
+import sys
 
 class App():
     def __init__(self):
@@ -14,12 +14,17 @@ class App():
         model = Model.DataModel()
 
         #create view
-        view = View.MainView()
+       
+        controller = Controller.MainController(model)
         
-        controller = Controller.MainController(model, view)
+        view = View.window(self, controller)
+       
         
-        view.set_controller(controller)
+        
+        
 
+        
+       
 if __name__ == '__main__':
+      
     a = App()
-    
