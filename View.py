@@ -52,6 +52,7 @@ class ASWindow(QMainWindow):
         print(self.e1.text())
 
     def clicked(self):
+        
         #links = self.controller.get_adv_search(e1.get(), e2.get(), e3.get())
         pass
 
@@ -101,13 +102,18 @@ class MainView(QMainWindow):
         self.b4.clicked.connect(self.analyze_dataset)
 
     def clicked(self):
-        #self.links = self.controller.get_search(e1.get())
+        
+        self.links = self.controller.get_search(self.e1.text())
+        print(self.links)
+
+
         #self.lb1.addItems(self.links)
         #call method to remove duplicate items from lb1
         pass
 
     def text_edited(self, s):
-        print(self.e1.text())
+        #print(self.e1.text())
+        pass
     
     def analyze_dataset():
         #call method in controller and pass contents of lb1
