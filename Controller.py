@@ -30,6 +30,10 @@ class MainController:
             #need to prompt user through view if there are 
             #still multiple links at this point
 
-        return links
+        return links 
+        #return links is incorrect and will be changed
+        #need to send the links to the model to then scrape the target site and then return just the
+        #title info, dataset size, and list of fields needed by the view
+        
 
 
