@@ -17,13 +17,7 @@ class App():
        
         controller = Controller.MainController(model)
         
-        view = View.window(self, controller)
-       
-        
-        
-        
-
-        
+        view = View.window(self, controller)  
        
 if __name__ == '__main__':
       
