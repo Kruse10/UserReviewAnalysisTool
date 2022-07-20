@@ -11,6 +11,20 @@ def window(self, c):
     
     sys.exit(app.exec_())
 
+class SelectWindow(QMainWindow):
+    def __init__(self, titles):
+        super().__init__()
+        self.setGeometry(100, 100, 200, 120)
+        self.setWindowTitle("select")
+        initUI(titles)
+
+    def initUI(self, titles):
+        self.dd1 = QComboBox()
+        self.dd1.move(0,0)
+        self.list_items = List()
+        for title in titles:
+            self.dd1.addItem(title)
+
 
 class ColWindow(QMainWindow):
     def __init__(self, col_title, row1):
@@ -59,27 +73,10 @@ class ASWindow(QMainWindow):
         self.b1.setText("-->")
         self.b1.clicked.connect(self.clicked)
 
-    def text_edited(self, s):
-        print(self.e1.text())
 
     def clicked(self):
         
         #links = self.controller.get_adv_search(e1.get(), e2.get(), e3.get())
-        pass
-
-class SelectWindow(QMainWindow):
-
-    def __init__(self, c):
-        super(MainView, self).__init__()
-
-        self.setGeometry(100, 100, 200, 120)
-        self.setWindowTitle("AdvancedSearch")
-        self.initUI()
-
-    def initUI():
-        pass
-
-    def select_link():
         pass
 
 
@@ -117,7 +114,6 @@ class MainView(QMainWindow):
         self.e1 = qtw.QLineEdit(self)
         self.e1.setMaxLength(20)
         self.e1.setPlaceholderText("Query")
-        self.e1.textEdited.connect(self.text_edited)
 
         self.lb1 = qtw.QListWidget(self)
         self.lb1.resize(200, 500)
@@ -129,19 +125,17 @@ class MainView(QMainWindow):
         self.b4.clicked.connect(self.analyze_dataset)
 
     def clicked(self):
-        
-        links = self.controller.get_search(self.e1.text())
+        initialsearch = InitialSearch()
+        links = self.initialsearch.get_search(self.e1.text())
         print(links)
 
 
         #self.lb1.addItems(self.links)
         #call method to remove duplicate items from lb1
+
+        initialsearch = None
         pass
 
-    def text_edited(self, s):
-        #print(self.e1.text())
-        pass
-    
     def analyze_dataset():
         #call method in controller and pass contents of lb1
         pass
@@ -162,7 +156,16 @@ class MainView(QMainWindow):
         self.w.show()
         
     def select_link(self, l):
-        '''self.w = SelectWindow()
+        #get titles from all lists
+        selecttitle=SelectTitle()
+        win = SelectWindow(selecttitle.get_title(l))
+        win.show()
+
+        
+        
+
+        selecttitle = None
+        '''self.w = SelectWindow(titles)
         self.w.show()
         return w.getlink()'''
         pass

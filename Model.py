@@ -2,13 +2,10 @@ import pandas as pd
 import requests
 import bs4
 from bs4 import BeautifulSoup
-from requests_html import HTMLSession
+import nltk
+from vaderSentiment.vaderSentiment import *
 
-class DataModel:
-    
-    def __init__(self):
-        self.df_list = list()
-        self.df_temp = None
+class ScrapeData:
 
     def get_response(self, url):
         try:
@@ -19,6 +16,7 @@ class DataModel:
         except requests.exceptions.RequestException as e:
             print(e)
 
+    
     def scrape_reviews(self, url):
         self.response = get_response(url)
         
@@ -45,6 +43,14 @@ class DataModel:
 
         return (str(moviename + str(len(reviews))))
 
+
+class DataModel:
+
+    def __init__(self):
+        self._df_list = list()
+        self.df_temp = None
+        self.scraper = ScrapeData()
+
     def load_dataset(self, path):
         self.df_temp = pd.read_csv(path)
         
@@ -53,5 +59,5 @@ class DataModel:
 
         #return "column check"
 
-    def append_temp(self):
+    def append_list(self):
         self.df_list.append(df_temp)

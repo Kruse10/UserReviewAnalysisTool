@@ -2,17 +2,22 @@ import requests
 import urllib
 from requests_html import HTML
 from requests_html import HTMLSession
+from bs4 import BeautifulSoup
 
 class MainController:
     
-
     def __init__(self, model):
         self.model = model
         self.response = None
-        self.target = 'https://www.imdb.com/title'
-
+        
     def set_view(self, v):
-        self.view = v
+        self.view = v   
+ 
+        
+class InitialSearch:
+
+    target = 'https://www.imdb.com/title'
+
     def getResponse(self, query):
         
         try:
@@ -21,13 +26,13 @@ class MainController:
             return response
         except requests.exceptions.RequestException as e:
             print(e)
-            
+
+         
     def get_search(self, query):
         query = urllib.parse.quote_plus(query)
-        self.response = self.getResponse("https://www.google.com/search?q=" + "imdb" 
+        self.response = InitialSearch.getResponse("https://www.google.com/search?q=" + "imdb" 
                               + query + "reviews")
         self.links = list(self.response.html.absolute_links)
-
 
         for url in self.links[:]:
             if not (url.startswith(self.target)) or "reviews" not in url or "critic" in url or "external" in url:
@@ -36,21 +41,38 @@ class MainController:
             #still multiple links at this point
         
         if len(self.links)>1:
-            pass
+            _selecttitle = SelectTitle()
+            links = _selecttitle.get_title(links)
+            _selecttitle = None
             #self.links = self.view.select_link(self.links) #incorrect, url not obvious to human reader need to get title
                           #controller should wait for event signifying that the button in the link selection window has been pressed
                          #select link should return a message for a specific link or to keep some subset of self.links
         
         for url in self.links[:]:
             #grab and store data
-            self.model.scrape_reviews(url)
+            self.model.scraper.scrape_reviews(url)
            
         return self.links 
         #return links is incorrect and will be changed
         #need to send the links to the model to then scrape the target site and then return just the
         #title info, dataset size, and list of fields needed by the view
-        
-        def open_file(self, path):
+
+
+class SelectTitle:
+
+    def get_title(self, links):
+        initialsearch = InitialSearch()
+        titles = List()
+        for url in links:
+            response = initialsearch.getResponse(url)
+            page = BeautifulSoup(self.response.content, 'html.parser')
+            #following line is almost certainly incomplete from what I remember
+            moviename = page.find('div', class_="parent").get_text()
+            titles.append(moviename)
+        return titles
+
+class LoadFiles:
+    def open_file(self, path):
             if (model.load_dataset(path)== "column check"):
 
                 view.colWindow(model.df_temp.columns.values.toList()
@@ -58,6 +80,3 @@ class MainController:
             else:
                 model.append_temp()
                 
-            
-
-
