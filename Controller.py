@@ -42,12 +42,22 @@ class MainController:
                          #select link should return a message for a specific link or to keep some subset of self.links
         
         for url in self.links[:]:
-            #self.model.get_response()    
-            pass
+            #grab and store data
+            self.model.scrape_reviews(url)
+           
         return self.links 
         #return links is incorrect and will be changed
         #need to send the links to the model to then scrape the target site and then return just the
         #title info, dataset size, and list of fields needed by the view
         
+        def open_file(self, path):
+            if (model.load_dataset(path)== "column check"):
+
+                view.colWindow(model.df_temp.columns.values.toList()
+                               , model.df_temp.loc[0].values.flatten().tolist())
+            else:
+                model.append_temp()
+                
+            
 
 

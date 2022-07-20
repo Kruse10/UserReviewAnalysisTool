@@ -11,6 +11,17 @@ def window(self, c):
     
     sys.exit(app.exec_())
 
+
+class ColWindow(QMainWindow):
+    def __init__(self, col_title, row1):
+        super().__init__()
+        self.setGeometry(100, 100, 200, 200)
+        self.setWindowTitle("column select")
+       
+    def initUI(self):
+        pass
+        #labels of current column titles and dropdowns of expected values
+
 class ASWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -141,8 +152,10 @@ class MainView(QMainWindow):
         options |= QFileDialog.DontUseNativeDialog
         fileName, _ = QFileDialog.getOpenFileName(self,"QFileDialog.getOpenFileName()", "",".csv (*.csv)", options=options)
         if fileName:
+            controller.open_file()
             print(fileName)
             self.lb1.addItem(fileName)
+            
    
     def advanced_search(self):
         self.w = ASWindow()

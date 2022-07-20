@@ -7,7 +7,8 @@ from requests_html import HTMLSession
 class DataModel:
     
     def __init__(self):
-        self.df = None
+        self.df_list = list()
+        self.df_temp = None
 
     def get_response(self, url):
         try:
@@ -36,7 +37,21 @@ class DataModel:
         dates = dates
         #helpfulpercentage=      in class='actions text-muted'
 
-        self.df= pd.DataFrame({'score': scores, 
+        self.df_temp= pd.DataFrame({'score': scores, 
                           'dates' : dates, 'reviewtexts' : reviewtexts})
-        self.df['movie'] = moviename
+        self.df_temp['movie'] = moviename
 
+        self.df_list.append(df_temp)
+
+        return (str(moviename + str(len(reviews))))
+
+    def load_dataset(self, path):
+        self.df_temp = pd.read_csv(path)
+        
+        # need to check to make sure columns match 
+        return (str(moviename + str(len(reviews))))
+
+        #return "column check"
+
+    def append_temp(self):
+        self.df_list.append(df_temp)
