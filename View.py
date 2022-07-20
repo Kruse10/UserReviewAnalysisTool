@@ -48,25 +48,21 @@ class ASWindow(QMainWindow):
         self.e1 = qtw.QLineEdit(self)
         self.e1.setMaxLength(20)
         self.e1.setPlaceholderText("Query")
-        self.e1.textEdited.connect(self.text_edited)
 
         self.e2 = qtw.QLineEdit(self)
         self.e2.setMaxLength(20)
         self.e2.move(0, 30)
         self.e2.setPlaceholderText("Director")
-        self.e2.textEdited.connect(self.text_edited)
 
         self.e3 = qtw.QLineEdit(self)
         self.e3.setMaxLength(20)
         self.e3.move(0, 60)
         self.e3.setPlaceholderText("Year")
-        self.e3.textEdited.connect(self.text_edited)
 
         self.e4 = qtw.QLineEdit(self)
         self.e4.setMaxLength(20)
         self.e4.move(0, 90)
         self.e4.setPlaceholderText("Actor")
-        self.e4.textEdited.connect(self.text_edited)
 
         self.b1 = qtw.QPushButton(self)
         self.b1.move(100,0)
@@ -125,7 +121,7 @@ class MainView(QMainWindow):
         self.b4.clicked.connect(self.analyze_dataset)
 
     def clicked(self):
-        initialsearch = InitialSearch()
+        self.initialsearch = self.controller.request_search()
         links = self.initialsearch.get_search(self.e1.text())
         print(links)
 
@@ -146,7 +142,6 @@ class MainView(QMainWindow):
         options |= QFileDialog.DontUseNativeDialog
         fileName, _ = QFileDialog.getOpenFileName(self,"QFileDialog.getOpenFileName()", "",".csv (*.csv)", options=options)
         if fileName:
-            controller.open_file()
             print(fileName)
             self.lb1.addItem(fileName)
             

@@ -11,10 +11,17 @@ class MainController:
         self.response = None
         
     def set_view(self, v):
-        self.view = v   
+        self.view = v
+
+    def request_search(self):
+        return InitialSearch(self.model)
+        
+    
  
         
 class InitialSearch:
+    def __init__(self, model):
+        self.model = model
 
     target = 'https://www.imdb.com/title'
 
@@ -30,8 +37,9 @@ class InitialSearch:
          
     def get_search(self, query):
         query = urllib.parse.quote_plus(query)
-        self.response = InitialSearch.getResponse("https://www.google.com/search?q=" + "imdb" 
+        query = ("https://www.google.com/search?q=" + "imdb" 
                               + query + "reviews")
+        self.response = self.getResponse(query)
         self.links = list(self.response.html.absolute_links)
 
         for url in self.links[:]:
@@ -71,12 +79,12 @@ class SelectTitle:
             titles.append(moviename)
         return titles
 
-class LoadFiles:
-    def open_file(self, path):
+class CheckColumns: 
+    def check_columns(self):
             if (model.load_dataset(path)== "column check"):
 
                 view.colWindow(model.df_temp.columns.values.toList()
                                , model.df_temp.loc[0].values.flatten().tolist())
             else:
-                model.append_temp()
+                model.append_list()
                 

@@ -18,7 +18,7 @@ class ScrapeData:
 
     
     def scrape_reviews(self, url):
-        self.response = get_response(url)
+        self.response = self.get_response(url)
         
         page = BeautifulSoup(self.response.content, 'html.parser')
         reviews = page.find_all('div', class_='review-container')
@@ -27,11 +27,11 @@ class ScrapeData:
 
         moviename = page.find('div', class_="parent").get_text()
         #reviewtext=             in class= 'text show-more_control'
-        reviewtexts = page.find_all('div', class_='text show-more_control').get_text()
+        reviewtexts = page.find_all('div', class_='text show-more_control')
         #score=                  in class= 'rating-other-user-rating'
-        scores= page.find_all('div', class_='rating-other-user-rating').get_text()
+        scores= page.find_all('div', class_='rating-other-user-rating')
         #date=                   in class='review date
-        dates= page.find_all('div', class_='review-date').get_text()
+        dates= page.find_all('div', class_='review-date')
         dates = dates
         #helpfulpercentage=      in class='actions text-muted'
 
@@ -50,8 +50,9 @@ class DataModel:
         self._df_list = list()
         self.df_temp = None
         self.scraper = ScrapeData()
+    
 
-    def load_dataset(self, path):
+    def load_dataset(self, path): 
         self.df_temp = pd.read_csv(path)
         
         # need to check to make sure columns match 
