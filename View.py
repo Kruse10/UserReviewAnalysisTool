@@ -149,9 +149,10 @@ class MainView(QMainWindow):
         self.w.show()
         
     def select_link(self, l):
-        self.w = SelectWindow()
+        '''self.w = SelectWindow()
         self.w.show()
-        return w.getlink()
+        return w.getlink()'''
+        pass
         
 
     
