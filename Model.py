@@ -87,7 +87,7 @@ class ScrapeData(DFBuilder):
 
 class LoadData(DFBuilder):
     def __init__(self, path):
-        self.new_df = pd.read_csv(path)
+        self.df = pd.read_csv(path)
         self.columnlist = ['review_score', 'review_date', 'review_text',
                           'title', 'sentiment', 'sentiment_score', 'score_difference']
     def build_dataset(self, path): 

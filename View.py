@@ -8,7 +8,7 @@ import sys
 def window(self, c):
     app = qtw.QApplication(sys.argv)
         
-    win = MainView(c)
+    win = MainWindow(c)
     c.set_view(win)
     win.show()
     
