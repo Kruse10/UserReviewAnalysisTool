@@ -38,7 +38,8 @@ class MainController(Controller):
                     
         self.model.build_report()        
         return self.model.visualize_data(vistype)            
-    def gather_data(self, l, collist)
+    def gather_data(self, l, collist):
+        pass
  
         
 class InitialSearch(Controller):
