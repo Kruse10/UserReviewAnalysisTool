@@ -24,17 +24,23 @@ class abcView(QMainWindow):
     def initUI(self): pass
 
 class ColWindow(abcView):
-    def __init__(self, col_title, row1):
-        super().__init__()
+    def __init__(self, controller,col_title, row1, p):
+        self.parentwindow = p
         self.setGeometry(100, 100, 200, 200)
         self.setWindowTitle("column select")
-       
+     #labels of current column titles and dropdowns of expected values  
     def initUI(self):
         pass
-        #labels of current column titles and dropdowns of expected values
+    
+    def assign_cols(new_collist):
 
-class ASWindow(abcView):
-    def __init__(self):
+        pass
+        
+
+class ASWindow(QMainWindow):
+    def __init__(self, c, p):
+        self.parentwindow = p
+        self.controller = c
         super().__init__()
         self.setGeometry(100, 100, 200, 120)
         self.setWindowTitle("AdvancedSearch")
@@ -56,10 +62,10 @@ class ASWindow(abcView):
         self.e3.move(0, 60)
         self.e3.setPlaceholderText("Year")
 
-        self.e4 = qtw.QLineEdit(self)
-        self.e4.setMaxLength(20)
-        self.e4.move(0, 90)
-        self.e4.setPlaceholderText("Actor")
+        #self.e4 = qtw.QLineEdit(self)
+        #self.e4.setMaxLength(20)
+        #self.e4.move(0, 90)
+        #self.e4.setPlaceholderText("Actor")
 
         self.b1 = qtw.QPushButton(self)
         self.b1.move(100,0)
@@ -69,7 +75,15 @@ class ASWindow(abcView):
 
     def clicked(self):
         
-        #links = self.controller.get_adv_search(e1.get(), e2.get(), e3.get())
+        links = self.controller.get_adv_search(self.e1.text(), self.e2.text(), self.e3.text())
+
+        lw_list = []
+        for x in range(self.parentwindow.lb1.count()):
+            lw_list.append(self.lb1.item(x).text())
+            
+        for item in links:
+            if item not in lw_list:
+                self.parentwindow.lb1.addItem(item)
         pass
 
 
@@ -130,11 +144,13 @@ class MainView(abcView):
             if item not in lw_list:
                 self.lb1.addItem(item)
         
-        initialsearch = None
-        
 
     def analyze_dataset():
-        #call method in controller and pass contents of lb1
+        lw_list = []
+        for x in range(self.lb1.count()):
+            lw_list.append(self.lb1.item(x).text())
+        vis = self.controller.gather_data(lw_list) #include vistype and if lw1 unchanged
+        
         pass
 
     def openFile(self):
@@ -152,22 +168,8 @@ class MainView(abcView):
             
    
     def advanced_search(self):
-        self.w = ASWindow()
+        self.w = ASWindow(self.controller, self)
         self.w.show()
-        
-    def select_link(self, l):
-        #get titles from all lists
-        selecttitle=SelectTitle()
-        win = SelectWindow(selecttitle.get_title(l))
-        win.show()
-
-        
-        
-
-        selecttitle = None
-        '''self.w = SelectWindow(titles)
-        self.w.show()
-        return w.getlink()'''
         pass
         
 

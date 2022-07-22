@@ -4,7 +4,8 @@ import requests
 import bs4
 from bs4 import BeautifulSoup
 import nltk
-from vaderSentiment.vaderSentiment import *
+from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+from scipy.stats import pearsonr
 
 class abcModel(ABC):
     @abstractmethod
@@ -12,7 +13,7 @@ class abcModel(ABC):
 
 class DFBuilder(abcModel):
     @abstractmethod
-    def analyze_sentiment(): pass
+    def build_dataset(self, str): pass
 
 
 class ScrapeData(DFBuilder):
@@ -28,13 +29,17 @@ class ScrapeData(DFBuilder):
             print(e)
 
     
-    def scrape_reviews(self, url):
+    def build_dataset(self, url):
+        
+        #unf
         self.response = self.get_response(url)
         
         self.page = BeautifulSoup(self.response.content, 'html.parser')
         reviews = page.find_all('div', class_='review-container')
         reviews_list = []
         dates_list = []
+
+
 
         self.df_temp= pd.DataFrame({'score': scores, 
                           'dates' : dates, 'reviewtexts' : reviewtexts})
@@ -56,7 +61,7 @@ class ScrapeData(DFBuilder):
             print("\n")
     
     def find_review_text():
-        reviews= (soup.find_all('div', class_='text show-more__control'))
+        reviews= (page.find_all('div', class_='text show-more__control'))
         #print(reviews)
         
         temp_review = str()
@@ -68,21 +73,71 @@ class ScrapeData(DFBuilder):
             reviews_list.append(temp_review)
             temp_review = ""
         return reviews_list
+    #unimplemented
+    def find_title():
+        pass
+
+
 
 class LoadData(DFBuilder):
     def __init__(self, path):
         self.new_df = pd.read_csv(path)
-
-    def load_dataset(self, path): 
+        self.columnlist = ['review_score', 'review_date', 'review_text',
+                          'title', 'sentiment', 'sentiment_score', 'score_difference']
+    def build_dataset(self, path): 
         
         for column in new_df.columns:
             if column not in columnlist:
-                pass #need to call method to open window to assign labels to existing columns not implemented yet
-                return "AssignCol"
-        #remove unscored
-
-
+                
+                return ["AssignCol", self.new_df.columns]
+            #begin building df and normalizing review scores
+            #remove unscored rows
         df = df[df['review_score'].apply(lambda x: isinstance(x, str))]
+        #theres probably a way to do all of these in one...
+        lambda_letter_a = lambda x: '1.0' if x.startswith('A') else x
+        lambda_letter_b = lambda x: '.8' if x.startswith('B') else x
+        lambda_letter_c = lambda x: '.6' if x.startswith('C') else x
+        lambda_letter_d = lambda x: '.4' if x.startswith('D') else x
+        lambda_letter_f = lambda x: '.2' if x.startswith('F') else x
+
+        #making our temporary df of normalized review scores
+        df2 = df.review_score.apply(lambda_letter_a).apply(lambda_letter_b).apply(lambda_letter_c).apply(lambda_letter_d).apply(lambda_letter_f)
+        df2 = df2.to_frame()
+
+        #drop review column from original df and add our normalized one
+        df = df.drop('review_score', axis=1) 
+        df2col=df2['review_score']
+        df = df.join(df2col)
+        
+        #preparing to analyze review_score column
+        sia = SentimentIntensityAnalyzer()
+        df["sentiment_score"] = None
+        df["sentiment"] = None
+        df["score_difference"]= None
+        
+        for (columnName, columnData) in df.iteritems():
+            if(columnName not in self.columnlist):
+                df = df.drop(columnName, axis=1)
+        for index, row in df.iterrows():
+            try:
+                sentiment = obj.polarity_scores(str(row['review_content']))
+                norm_sentiment = ((sentiment['compound'])+1)/2
+                row['sentiment_score'] = norm_sentiment
+        
+                if norm_sentiment > .55:
+                    row['sentiment'] = 'pos'
+                elif norm_sentiment < .45:
+                    row['sentiment'] = 'neg'
+                else:
+                    row['sentiment'] = 'neutral'
+            
+                row['score_difference'] = row['review_score']-row['sentiment_score']
+        #get correlation, average scores, etc   save to .txt
+        return df
+
+for index, row in df2.iterrows():
+    try : row['review_score'] = eval(row['review_score'])
+    except: pass
 
     
 class DataModel(abcModel):
@@ -92,15 +147,22 @@ class DataModel(abcModel):
                           'review_date', 'review_text',
                           'title', 'sentiment', 'sentiment_score', 'score_difference'})
         
-    def build_df(self, list, s):
+    def build_df(self, item , s):
         if s == "url":
-            pass #instantiate ScrapeData and 
+            self.d = ScrapeData()
+            self.df.append(d.scrape_reviews(item))
         elif s == "path":
-            pass
-
+            self.d = LoadData()
+            returned_df = d.load_dataset(item)
+            if returned_df == "AssignCol":
+                return #unfinished
+            self.df.append(d.load_dataset(item))
+        
+    def visualize_data(self, vistype):
         pass
-    
 
+    def build_report(df):
+        pass
     
 
 

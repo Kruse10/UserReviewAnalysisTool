@@ -17,22 +17,28 @@ class MainController(Controller):
     def __init__(self, model):
         self.model = model
         self.response = None
-        
+        self.waiting = False
     def set_view(self, v):
         self.view = v
 
     def request_search(self, query):
         return InitialSearch().get_search(query)
-
-
-    def analyze_data(self, list):
-        for item in list:
-            if list[item].startswith("http"):
-                self.model.build_df(list[item], "url")
-            else:
-                self.model.build_df(list[item], "path")
-                
     
+    def get_adv_search(self, q1, q2, q3):
+        return InitialSearch().get_adv_search(q1, q2, q3)
+
+    def gather_data(self, l):
+        for item in l:
+            if l[item].startswith("http"):
+                self.model.build_df(l[item], "url")
+            else:
+                returnstr = self.model.build_df(list[item], "path")
+                if isinstance(returntype, list):
+                    CheckColumns(self.view).check_columns(model.d.new_df.columns , model.d.new_df.iloc[0])
+                    
+        self.model.build_report()        
+        return self.model.visualize_data(vistype)            
+    def gather_data(self, l, collist)
  
         
 class InitialSearch(Controller):
@@ -49,7 +55,6 @@ class InitialSearch(Controller):
 
          
     def get_search(self, query):
-        query = urllib.parse.quote_plus(query)
         query = ("https://www.google.com/search?q=" + "imdb" 
                               + query + "reviews")
         self.response = self.getResponse(query)
@@ -59,11 +64,32 @@ class InitialSearch(Controller):
             if not (url.startswith(self.target)) or "reviews" not in url or "critic" in url or "external" in url:
                 self.links.remove(url)
                           
-        return self.links 
+        return self.links
 
+    def get_adv_search(self, q1, q2, q3):
+        q1 = ("https://www.google.com/search?q=" + "imdb" + q1)
+        self.response = self.getResponse(q1)
+        self.links = list(self.response.html.absolute_links)
+        
+        removed_endings = ["reviews", "critic", "trivia/", "external", "parentalguide", "fullcredits"]
+        for url in self.links[:]:
+            if not (url.startswith(self.target)):
+                self.links.remove(url)
+            for endstr in removed_endings:
+                if url.endswith(endstr):
+                    self.links.remove(url)
+        
+        filter_by(q2, q3)
+
+        return self.links
+
+
+    def filter_by(q2, q3):
+        #search the pages and remove results that dont match criteria
+        pass
 
 class SelectTitle(Controller):
-
+    #unfinished
     def get_title(self, links):
         initialsearch = InitialSearch()
         titles = List()
@@ -71,16 +97,15 @@ class SelectTitle(Controller):
             response = initialsearch.getResponse(url)
             page = BeautifulSoup(self.response.content, 'html.parser')
             #following line is almost certainly incomplete from what I remember
-            moviename = page.find('div', class_="parent").get_text()
+            pass
             titles.append(moviename)
         return titles
 
-class CheckColumns(Controller): 
-    def check_columns(self):
-            if (model.load_dataset(path)== "column check"):
-
-                view.colWindow(model.df_temp.columns.values.toList()
-                               , model.df_temp.loc[0].values.flatten().tolist())
-            else:
-                model.append_list()
+class CheckColumns(Controller):
+    def __init__(self, v):
+        self.view = v
+    
+    def check_columns(self, titles, row1):
+        self.view.ColWindow(self, titles, row1)
+        pass
                 
