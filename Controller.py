@@ -1,10 +1,18 @@
 import requests
 import urllib
+from abc import ABC, abstractmethod
 from requests_html import HTML
 from requests_html import HTMLSession
 from bs4 import BeautifulSoup
 
-class MainController:
+class Controller(ABC):
+    @abstractmethod
+    def __init__(self): pass
+
+
+
+
+class MainController(Controller):
     
     def __init__(self, model):
         self.model = model
@@ -13,18 +21,23 @@ class MainController:
     def set_view(self, v):
         self.view = v
 
-    def request_search(self):
-        return InitialSearch(self.model)
-        
+    def request_search(self, query):
+        return InitialSearch().get_search(query)
+
+
+    def analyze_data(self, list):
+        for item in list:
+            if list[item].startswith("http"):
+                self.model.scraper.scrape_reviews(list[item])
+            else:
+                self.model.load_dataset(list[item])
+                
     
  
         
-class InitialSearch:
-    def __init__(self, model):
-        self.model = model
-
-    target = 'https://www.imdb.com/title'
-
+class InitialSearch(Controller):
+    def __init__(self):
+        self.target ='https://www.imdb.com/title'
     def getResponse(self, query):
         
         try:
@@ -45,28 +58,11 @@ class InitialSearch:
         for url in self.links[:]:
             if not (url.startswith(self.target)) or "reviews" not in url or "critic" in url or "external" in url:
                 self.links.remove(url)
-            #need to prompt user through view if there are 
-            #still multiple links at this point
-        
-        if len(self.links)>1:
-            _selecttitle = SelectTitle()
-            links = _selecttitle.get_title(links)
-            _selecttitle = None
-            #self.links = self.view.select_link(self.links) #incorrect, url not obvious to human reader need to get title
-                          #controller should wait for event signifying that the button in the link selection window has been pressed
-                         #select link should return a message for a specific link or to keep some subset of self.links
-        
-        for url in self.links[:]:
-            #grab and store data
-            self.model.scraper.scrape_reviews(url)
-           
+                          
         return self.links 
-        #return links is incorrect and will be changed
-        #need to send the links to the model to then scrape the target site and then return just the
-        #title info, dataset size, and list of fields needed by the view
 
 
-class SelectTitle:
+class SelectTitle(Controller):
 
     def get_title(self, links):
         initialsearch = InitialSearch()
@@ -79,7 +75,7 @@ class SelectTitle:
             titles.append(moviename)
         return titles
 
-class CheckColumns: 
+class CheckColumns(Controller): 
     def check_columns(self):
             if (model.load_dataset(path)== "column check"):
 

@@ -1,5 +1,8 @@
+from PyQt5.QtCore import QObject
+from abc import ABC, abstractmethod, ABCMeta
 from PyQt5 import QtWidgets as qtw
 from PyQt5.QtWidgets import *
+
 import sys
 
 def window(self, c):
@@ -11,22 +14,16 @@ def window(self, c):
     
     sys.exit(app.exec_())
 
-class SelectWindow(QMainWindow):
-    def __init__(self, titles):
-        super().__init__()
-        self.setGeometry(100, 100, 200, 120)
-        self.setWindowTitle("select")
-        initUI(titles)
+class abcView_Meta(type(QMainWindow), type(ABCMeta)): pass
 
-    def initUI(self, titles):
-        self.dd1 = QComboBox()
-        self.dd1.move(0,0)
-        self.list_items = List()
-        for title in titles:
-            self.dd1.addItem(title)
+class abcView(QMainWindow):
+    @abstractmethod
+    def __init__(self): pass
 
+    @abstractmethod
+    def initUI(self): pass
 
-class ColWindow(QMainWindow):
+class ColWindow(abcView):
     def __init__(self, col_title, row1):
         super().__init__()
         self.setGeometry(100, 100, 200, 200)
@@ -36,7 +33,7 @@ class ColWindow(QMainWindow):
         pass
         #labels of current column titles and dropdowns of expected values
 
-class ASWindow(QMainWindow):
+class ASWindow(abcView):
     def __init__(self):
         super().__init__()
         self.setGeometry(100, 100, 200, 120)
@@ -76,10 +73,10 @@ class ASWindow(QMainWindow):
         pass
 
 
-class MainView(QMainWindow): 
-
+class MainView(abcView): 
+    __metaclass__ = abcView_Meta
     def __init__(self, c):
-        super(MainView, self).__init__()
+        super(abcView, self).__init__()
         self.setGeometry(100, 100, 500, 570)
         self.setWindowTitle("Main Window")
         self.controller = c
@@ -121,16 +118,20 @@ class MainView(QMainWindow):
         self.b4.clicked.connect(self.analyze_dataset)
 
     def clicked(self):
-        self.initialsearch = self.controller.request_search()
-        links = self.initialsearch.get_search(self.e1.text())
-        print(links)
+       
+        links =  self.controller.request_search(self.e1.text())
 
-
-        #self.lb1.addItems(self.links)
-        #call method to remove duplicate items from lb1
-
+        #next 6 lines prevent duplicate additions
+        lw_list = []
+        for x in range(self.lb1.count()):
+            lw_list.append(self.lb1.item(x).text())
+            
+        for item in links:
+            if item not in lw_list:
+                self.lb1.addItem(item)
+        
         initialsearch = None
-        pass
+        
 
     def analyze_dataset():
         #call method in controller and pass contents of lb1
@@ -141,8 +142,12 @@ class MainView(QMainWindow):
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog
         fileName, _ = QFileDialog.getOpenFileName(self,"QFileDialog.getOpenFileName()", "",".csv (*.csv)", options=options)
-        if fileName:
-            print(fileName)
+        
+        #next 6 lines prevent duplicate additions
+        lw_list = []
+        for x in range(self.lb1.count()):
+            lw_list.append(self.lb1.item(x).text())
+        if fileName not in lw_list:
             self.lb1.addItem(fileName)
             
    

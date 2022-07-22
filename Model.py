@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup
 import nltk
 from vaderSentiment.vaderSentiment import *
 
+
 class ScrapeData:
 
     def get_response(self, url):
@@ -20,20 +21,10 @@ class ScrapeData:
     def scrape_reviews(self, url):
         self.response = self.get_response(url)
         
-        page = BeautifulSoup(self.response.content, 'html.parser')
+        self.page = BeautifulSoup(self.response.content, 'html.parser')
         reviews = page.find_all('div', class_='review-container')
-        
-        #need to remove tags from results still
-
-        moviename = page.find('div', class_="parent").get_text()
-        #reviewtext=             in class= 'text show-more_control'
-        reviewtexts = page.find_all('div', class_='text show-more_control')
-        #score=                  in class= 'rating-other-user-rating'
-        scores= page.find_all('div', class_='rating-other-user-rating')
-        #date=                   in class='review date
-        dates= page.find_all('div', class_='review-date')
-        dates = dates
-        #helpfulpercentage=      in class='actions text-muted'
+        reviews_list = []
+        dates_list = []
 
         self.df_temp= pd.DataFrame({'score': scores, 
                           'dates' : dates, 'reviewtexts' : reviewtexts})
@@ -42,23 +33,53 @@ class ScrapeData:
         self.df_list.append(df_temp)
 
         return (str(moviename + str(len(reviews))))
+    
+    def find_date():
+        
+        reviewdates= (self.page.find_all('span', class_='review-date'))
+        
+        for i in reviewdates:
+            dates_list.append(i.contents[0])
+
+        for r in range(len(dates_list)):
+            print( dates_list[r])
+            print("\n")
+    
+    def find_review_text():
+        reviews= (soup.find_all('div', class_='text show-more__control'))
+        #print(reviews)
+        
+        temp_review = str()
+        
+        for i in reviews:
+            r = len(i.contents)
+            for j in range(r):
+                temp_review += (i.contents[j].text)
+            reviews_list.append(temp_review)
+            temp_review = ""
+        return reviews_list
 
 
 class DataModel:
 
     def __init__(self):
-        self._df_list = list()
-        self.df_temp = None
+        self.df= pd.DataFrame({'review_score', 
+                          'review_date', 'review_text',
+                          'title', 'sentiment', 'sentiment_score', 'score_difference'})
+        
         self.scraper = ScrapeData()
     
 
     def load_dataset(self, path): 
-        self.df_temp = pd.read_csv(path)
+        self.new_df = pd.read_csv(path)
+        for column in new_df.columns:
+            if column not in columnlist:
+                pass #need to call method to open window to assign labels to existing columns not implemented yet
+                return "AssignCol"
+        #remove unscored
+
+
+        df = df[df['review_score'].apply(lambda x: isinstance(x, str))]
+
+
         
-        # need to check to make sure columns match 
-        return (str(moviename + str(len(reviews))))
-
-        #return "column check"
-
-    def append_list(self):
-        self.df_list.append(df_temp)
