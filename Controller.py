@@ -28,9 +28,9 @@ class MainController(Controller):
     def analyze_data(self, list):
         for item in list:
             if list[item].startswith("http"):
-                self.model.scraper.scrape_reviews(list[item])
+                self.model.build_df(list[item], "url")
             else:
-                self.model.load_dataset(list[item])
+                self.model.build_df(list[item], "path")
                 
     
  

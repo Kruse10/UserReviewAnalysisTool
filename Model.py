@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod
 import pandas as pd
 import requests
 import bs4
@@ -5,14 +6,23 @@ from bs4 import BeautifulSoup
 import nltk
 from vaderSentiment.vaderSentiment import *
 
+class abcModel(ABC):
+    @abstractmethod
+    def __init__(self): pass
 
-class ScrapeData:
+class DFBuilder(abcModel):
+    @abstractmethod
+    def analyze_sentiment(): pass
 
+
+class ScrapeData(DFBuilder):
+    def __init__(self):
+        self.headers = { 'Accept-Language' : 'en-US,en;q=0.5' 
+                       , 'User-agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101 Firefox/102.0' }
     def get_response(self, url):
         try:
-            headers = { 'Accept-Language' : 'en-US,en;q=0.5' 
-                       , 'User-agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101 Firefox/102.0' }
-            response = requests.get(url, headers=headers)
+            
+            response = requests.get(url, headers=self.headers)
             return response
         except requests.exceptions.RequestException as e:
             print(e)
@@ -59,19 +69,12 @@ class ScrapeData:
             temp_review = ""
         return reviews_list
 
-
-class DataModel:
-
-    def __init__(self):
-        self.df= pd.DataFrame({'review_score', 
-                          'review_date', 'review_text',
-                          'title', 'sentiment', 'sentiment_score', 'score_difference'})
-        
-        self.scraper = ScrapeData()
-    
+class LoadData(DFBuilder):
+    def __init__(self, path):
+        self.new_df = pd.read_csv(path)
 
     def load_dataset(self, path): 
-        self.new_df = pd.read_csv(path)
+        
         for column in new_df.columns:
             if column not in columnlist:
                 pass #need to call method to open window to assign labels to existing columns not implemented yet
@@ -80,6 +83,25 @@ class DataModel:
 
 
         df = df[df['review_score'].apply(lambda x: isinstance(x, str))]
+
+    
+class DataModel(abcModel):
+
+    def __init__(self):
+        self.df= pd.DataFrame({'review_score', 
+                          'review_date', 'review_text',
+                          'title', 'sentiment', 'sentiment_score', 'score_difference'})
+        
+    def build_df(self, list, s):
+        if s == "url":
+            pass #instantiate ScrapeData and 
+        elif s == "path":
+            pass
+
+        pass
+    
+
+    
 
 
         
