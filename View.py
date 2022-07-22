@@ -16,16 +16,16 @@ def window(self, c):
 
 class abcView_Meta(type(QMainWindow), type(ABCMeta)): pass
 
-class abcView(QMainWindow):
+class ab_View(QMainWindow):
     @abstractmethod
     def __init__(self): pass
 
     @abstractmethod
     def initUI(self): pass
 
-class ColWindow(abcView):
-    def __init__(self, controller,col_title, row1, p):
-        self.parentwindow = p
+class ColWindow(ab_View):
+    def __init__(self, controller ,col_title, row1):
+        super().__init__()
         self.setGeometry(100, 100, 200, 200)
         self.setWindowTitle("column select")
      #labels of current column titles and dropdowns of expected values  
@@ -33,12 +33,20 @@ class ColWindow(abcView):
         pass
     
     def assign_cols(new_collist):
-
         pass
         
+class VisWindow(ab_View):
+    __metaclass__ = abcView_Meta
+    def __init__(self):
+        super(ab_View, self).__init__()
 
-class ASWindow(QMainWindow):
+    def initUI(self):
+        pass
+
+class ASWindow(ab_View):
+    __metaclass__ = abcView_Meta
     def __init__(self, c, p):
+        super(ab_View, self).__init__()
         self.parentwindow = p
         self.controller = c
         super().__init__()
@@ -87,10 +95,10 @@ class ASWindow(QMainWindow):
         pass
 
 
-class MainView(abcView): 
+class MainWindow(ab_View): 
     __metaclass__ = abcView_Meta
     def __init__(self, c):
-        super(abcView, self).__init__()
+        super(ab_View, self).__init__()
         self.setGeometry(100, 100, 500, 570)
         self.setWindowTitle("Main Window")
         self.controller = c

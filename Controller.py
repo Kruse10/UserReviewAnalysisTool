@@ -5,19 +5,20 @@ from requests_html import HTML
 from requests_html import HTMLSession
 from bs4 import BeautifulSoup
 
-class Controller(ABC):
+class ab_Controller(ABC):
     @abstractmethod
     def __init__(self): pass
 
 
 
 
-class MainController(Controller):
+class MainController(ab_Controller):
     
     def __init__(self, model):
         self.model = model
         self.response = None
         self.waiting = False
+    
     def set_view(self, v):
         self.view = v
 
@@ -42,7 +43,7 @@ class MainController(Controller):
         pass
  
         
-class InitialSearch(Controller):
+class InitialSearch(ab_Controller):
     def __init__(self):
         self.target ='https://www.imdb.com/title'
     def getResponse(self, query):
@@ -89,7 +90,7 @@ class InitialSearch(Controller):
         #search the pages and remove results that dont match criteria
         pass
 
-class SelectTitle(Controller):
+class GetTitles(ab_Controller):
     #unfinished
     def get_title(self, links):
         initialsearch = InitialSearch()
@@ -102,7 +103,7 @@ class SelectTitle(Controller):
             titles.append(moviename)
         return titles
 
-class CheckColumns(Controller):
+class CheckColumns(ab_Controller):
     def __init__(self, v):
         self.view = v
     

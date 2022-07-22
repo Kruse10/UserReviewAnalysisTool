@@ -7,11 +7,17 @@ import nltk
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 from scipy.stats import pearsonr
 
-class abcModel(ABC):
+class ab_Model(ABC):
     @abstractmethod
     def __init__(self): pass
 
-class DFBuilder(abcModel):
+    @abstractmethod
+    def build_df(self): pass
+
+class DFBuilder(ABC):
+    @abstractmethod
+    def __init__(self): pass
+
     @abstractmethod
     def build_dataset(self, str): pass
 
@@ -132,15 +138,19 @@ class LoadData(DFBuilder):
                     row['sentiment'] = 'neutral'
             
                 row['score_difference'] = row['review_score']-row['sentiment_score']
+            except:
+                pass
         #get correlation, average scores, etc   save to .txt
+        
+
+        for index, row in selfdf2.iterrows():
+            try : row['review_score'] = eval(row['review_score'])
+            except: pass
+
         return df
 
-for index, row in df2.iterrows():
-    try : row['review_score'] = eval(row['review_score'])
-    except: pass
-
     
-class DataModel(abcModel):
+class DataModel(ab_Model):
 
     def __init__(self):
         self.df= pd.DataFrame({'review_score', 
