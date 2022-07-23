@@ -68,6 +68,10 @@ class InitialSearch(ab_Controller):
                           
         return self.links
 
+    def filter_by(self, q2, q3):
+        
+        pass
+
     def get_adv_search(self, q1, q2, q3):
         q1 = ("https://www.google.com/search?q=" + "imdb" + q1)
         self.response = self.getResponse(q1)
@@ -81,14 +85,12 @@ class InitialSearch(ab_Controller):
                 if url.endswith(endstr):
                     self.links.remove(url)
         
-        filter_by(q2, q3)
+        self.filter_by(q2, q3)
 
         return self.links
 
 
-    def filter_by(q2, q3):
-        #search the pages and remove results that dont match criteria
-        pass
+    
 
 class GetTitles(ab_Controller):
     #unfinished

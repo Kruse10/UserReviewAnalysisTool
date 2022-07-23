@@ -87,7 +87,7 @@ class ASWindow(ab_View):
 
         lw_list = []
         for x in range(self.parentwindow.lb1.count()):
-            lw_list.append(self.lb1.item(x).text())
+            lw_list.append(parentwindow.lb1.item(x).text())
             
         for item in links:
             if item not in lw_list:
