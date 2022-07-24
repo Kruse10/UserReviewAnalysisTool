@@ -11,7 +11,7 @@ class ab_Controller(ABC):
 
 
 class MovieInfo:
-    def __init__(self, url, t, y, d, k):
+    def __init__(self, url, t, y, d, k, c):
         self.url = url
         self.year = y
         self.director = d
@@ -123,8 +123,34 @@ class InitialSearch(ab_Controller):
         if(dir == ''):
             k_d = 'ignore'
         
+        castlist= []
+        cast = page.find_all('td', class_='primary_photo')
+    
+    
+        for person in cast:
+            castlist.append(person)
+        
+            n=0
+            np=0
+            nstring = ''
+            for char in str(person):
+            
+                if np==2:
+                    break
+                if char == '>':
+                    n+=1
+                if n==2:
+                    if char == '"':
+                        np+=1
+                    if np==1 and char != '"':
+                        nstring=nstring+char
+                    if np == 2:
+                        break
+            
+            castlist.append(nstring)
+        
         if ((k_year == 'ignore') and ( k_d == 'ignore')):
-            return MovieInfo(url, q1,year,d, 'keep')
+            return MovieInfo(url, q1,year,d, 'keep', castlist)
         elif ((k_year == 'ignore') and ( d == dir)) :
             return MovieInfo(url, q1,year,d, 'keep')
         elif ((year == y1) and (k_d == 'ignore')):
