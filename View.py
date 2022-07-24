@@ -104,58 +104,72 @@ class MainWindow(ab_View):
     __metaclass__ = abcView_Meta
     def __init__(self, c):
         super(ab_View, self).__init__()
-        self.setGeometry(100, 100, 500, 570)
-        self.setWindowTitle("Main Window")
+        self.setGeometry(100, 100, 350, 400)
+        self.setWindowTitle("Dataset Entry")
         self.controller = c
         self.initUI()
+        self.movielist= []
 
     def initUI(self): 
-        #actual layout is still a little jank at the moment 
-        self.label = qtw.QLabel(self)
-        self.label.setText("search")
-        self.label.move(0,0)
-
         self.b1 = qtw.QPushButton(self)
-        self.b1.move(130,0)
+        self.b1.move(180,10)
+        self.b1.resize(150, 50)
         self.b1.setText("-->")
         self.b1.clicked.connect(self.clicked)
-
         
         self.b2 = qtw.QPushButton(self)
-        self.b2.move(130, 75)
+        self.b2.move(10 , 85)
+        self.b2.resize(150,30)
         self.b2.setText("import dataset")
         self.b2.clicked.connect(self.openFile)
 
         self.b3 = qtw.QPushButton(self)
-        self.b3.move(130, 50)
+        self.b3.move(10, 50)
+        self.b3.resize(150, 30)
         self.b3.setText("Advanced search")
         self.b3.clicked.connect(self.advanced_search)
 
         self.e1 = qtw.QLineEdit(self)
+        self.e1.move(10, 10)
+        self.e1.resize(150,30)
         self.e1.setMaxLength(20)
         self.e1.setPlaceholderText("Query")
 
         self.lb1 = qtw.QListWidget(self)
-        self.lb1.resize(200, 500)
-        self.lb1.move(250, 25)
+        self.lb1.resize(328, 280)
+        self.lb1.move(10,120)
 
         self.b4 = qtw.QPushButton(self)
-        self.b4.move(250, 530)
+        self.b4.resize(150, 50)
+        self.b4.move(180, 65)
         self.b4.setText("analyze datasets")
         self.b4.clicked.connect(self.analyze_dataset)
 
     def clicked(self):
        
-        links =  self.controller.request_search(self.e1.text())
+        #links =  self.controller.request_search(self.e1.text())
 
         #next 6 lines prevent duplicate additions
-        lw_list = []
-        for x in range(self.lb1.count()):
-            lw_list.append(self.lb1.item(x).text())
+        #lw_list = []
+        #for x in range(self.lb1.count()):
+            #lw_list.append(self.lb1.item(x).text())
             
-        for item in links.url:
-            if item not in lw_list:
-                self.lb1.addItem(item)
+       # for item in links.url:
+           #if item not in lw_list:
+                #self.lb1.addItem(item)
+        newmovielist = self.controller.request_search(self.e1.text())
+        for mov in newmovielist:
+            if mov in self.movielist:
+                newmovielist.remove(mov)
+
+        lw_list = []
+        if len(newmovielist) > 0:
+            for x in range(len(self.movielist)):
+                lw_list.append(self.lb1.item(x).text())
+            
+            for item in newmovielist:
+                if item.get_str() not in lw_list:
+                    self.lb1.addItem(item.get_str())
         
 
     def analyze_dataset():
