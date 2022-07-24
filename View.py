@@ -2,7 +2,6 @@ from PyQt5.QtCore import QObject
 from abc import ABC, abstractmethod, ABCMeta
 from PyQt5 import QtWidgets as qtw
 from PyQt5.QtWidgets import *
-
 import sys
 
 def window(self, c):
@@ -83,7 +82,6 @@ class ASWindow(ab_View):
 
 
     def clicked(self):
-        
         newmovielist = self.controller.get_adv_search(self.e1.text(), self.e2.text(), self.e3.text(), self.e4.text())
         for mov in newmovielist:
             if mov in self.movielist:
@@ -98,8 +96,6 @@ class ASWindow(ab_View):
                 if item.get_str() not in lw_list:
                     self.parentwindow.lb1.addItem(item.get_str())
        
-
-
 class MainWindow(ab_View): 
     __metaclass__ = abcView_Meta
     def __init__(self, c):
@@ -164,8 +160,7 @@ class MainWindow(ab_View):
             for item in newmovielist:
                 if item.get_str() not in lw_list:
                     self.lb1.addItem(item.get_str())
-        
-
+                    
     def analyze_dataset():
         lw_list = []
         for x in range(self.lb1.count()):
@@ -173,7 +168,6 @@ class MainWindow(ab_View):
         df = self.controller.gather_data(lw_list)
 
         create_new_plot()
-
 
     def openFile(self):
         
@@ -193,6 +187,8 @@ class MainWindow(ab_View):
         self.w = ASWindow(self.controller, self)
         self.w.show()
         pass
+
+    def create_new_plot(): pass
         
 
     

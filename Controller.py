@@ -5,27 +5,37 @@ from requests_html import HTML
 from requests_html import HTMLSession
 from bs4 import BeautifulSoup
 
+
 class ab_Controller(ABC):
     @abstractmethod
     def __init__(self): pass
 
 
-class MovieInfo:
+class ab_ProductType_Info(ABC):
+    @abstractmethod
+    def __init__(self): pass
+
+    @abstractmethod
+    def get_keep(self): pass
+
+    @abstractmethod
+    def get_str(self): pass
+
+#holds basic movie info and how to output to view 
+class MovieInfo(ab_ProductType_Info):
     def __init__(self, url, t, y, d, k, c):
         self.url = url
         self.year = y
         self.director = d
         self.title = t
         self.keep = k
-
-        
+       
     def get_keep(self):
         return self.keep
     def get_str(self):
-        return self.url + "\n" + self.title + " " + self.year + " " + self.director
+        return self.title + " " + self.year + " " + self.director
 
 class MainController(ab_Controller):
-    
     def __init__(self, model):
         self.model = model
         self.response = None
@@ -53,8 +63,7 @@ class MainController(ab_Controller):
         return self.model.visualize_data(vistype)            
     def gather_data(self, l, collist):
         pass
- 
-        
+         
 class InitialSearch(ab_Controller):
     def __init__(self):
         self.target ='https://www.imdb.com/title'
@@ -159,7 +168,6 @@ class InitialSearch(ab_Controller):
         castlist= []
         cast = page.find_all('td', class_='primary_photo')
     
-    
         for person in cast:
             n=0
             np=0
@@ -239,10 +247,8 @@ class InitialSearch(ab_Controller):
                         nstring=nstring+char
                     if np == 2:
                         break
-            
-            castlist.append(nstring)
-
-        
+          
+            castlist.append(nstring)        
         return MovieInfo(url, query,year,d, 'keep', castlist)
 
 class CheckColumns(ab_Controller):
