@@ -244,22 +244,6 @@ class InitialSearch(ab_Controller):
 
         
         return MovieInfo(url, query,year,d, 'keep', castlist)
-        
-
-    
-
-class GetTitles(ab_Controller):
-    #unfinished
-    def get_title(self, links):
-        initialsearch = InitialSearch()
-        titles = List()
-        for url in links:
-            response = initialsearch.getResponse(url)
-            page = BeautifulSoup(self.response.content, 'html.parser')
-            #following line is almost certainly incomplete from what I remember
-            pass
-            titles.append(moviename)
-        return titles
 
 class CheckColumns(ab_Controller):
     def __init__(self, v):
