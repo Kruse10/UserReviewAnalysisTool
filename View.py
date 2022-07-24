@@ -70,10 +70,10 @@ class ASWindow(ab_View):
         self.e3.move(0, 60)
         self.e3.setPlaceholderText("Year")
 
-        #self.e4 = qtw.QLineEdit(self)
-        #self.e4.setMaxLength(20)
-        #self.e4.move(0, 90)
-        #self.e4.setPlaceholderText("Actor")
+        self.e4 = qtw.QLineEdit(self)
+        self.e4.setMaxLength(20)
+        self.e4.move(0, 90)
+        self.e4.setPlaceholderText("Cast\crew")
 
         self.b1 = qtw.QPushButton(self)
         self.b1.move(100,0)
@@ -83,11 +83,11 @@ class ASWindow(ab_View):
 
     def clicked(self):
         
-        links = self.controller.get_adv_search(self.e1.text(), self.e2.text(), self.e3.text())
+        links = self.controller.get_adv_search(self.e1.text(), self.e2.text(), self.e3.text(), self.e4.text())
 
         lw_list = []
         for x in range(self.parentwindow.lb1.count()):
-            lw_list.append(parentwindow.lb1.item(x).text())
+            lw_list.append(self.parentwindow.lb1.item(x).text())
             
         for item in links:
             if item not in lw_list:
@@ -148,7 +148,7 @@ class MainWindow(ab_View):
         for x in range(self.lb1.count()):
             lw_list.append(self.lb1.item(x).text())
             
-        for item in links:
+        for item in links.url:
             if item not in lw_list:
                 self.lb1.addItem(item)
         
