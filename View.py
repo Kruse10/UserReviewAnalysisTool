@@ -49,6 +49,7 @@ class ASWindow(ab_View):
         super(ab_View, self).__init__()
         self.parentwindow = p
         self.controller = c
+        self.movielist = []
         super().__init__()
         self.setGeometry(100, 100, 200, 120)
         self.setWindowTitle("AdvancedSearch")
@@ -83,16 +84,20 @@ class ASWindow(ab_View):
 
     def clicked(self):
         
-        links = self.controller.get_adv_search(self.e1.text(), self.e2.text(), self.e3.text(), self.e4.text())
+        newmovielist = self.controller.get_adv_search(self.e1.text(), self.e2.text(), self.e3.text(), self.e4.text())
+        for mov in newmovielist:
+            if mov in self.movielist:
+                newmovielist.remove(mov)
 
         lw_list = []
-        for x in range(self.parentwindow.lb1.count()):
-            lw_list.append(self.parentwindow.lb1.item(x).text())
+        if len(newmovielist) > 0:
+            for x in range(len(self.movielist)):
+                lw_list.append(self.parentwindow.lb1.item(x).text())
             
-        for item in links:
-            if item not in lw_list:
-                self.parentwindow.lb1.addItem(item)
-        pass
+            for item in newmovielist:
+                if item.get_str() not in lw_list:
+                    self.parentwindow.lb1.addItem(item.get_str())
+       
 
 
 class MainWindow(ab_View): 

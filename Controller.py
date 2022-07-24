@@ -12,12 +12,17 @@ class ab_Controller(ABC):
 
 class MovieInfo:
     def __init__(self, url, t, y, d, k):
+        self.url = url
         self.year = y
         self.director = d
         self.title = t
         self.keep = k
+
+        
     def get_keep(self):
         return self.keep
+    def get_str(self):
+        return self.url + "\n" + self.year + " " + self.director
 
 class MainController(ab_Controller):
     
@@ -83,47 +88,46 @@ class InitialSearch(ab_Controller):
         session.headers.update(hd)
         n_response = requests.get(url)
         page = BeautifulSoup(n_response.content, 'html.parser')
-        if (y1.strip() != ''):
+        k_year ='keep'
+        k_dir = 'keep'
+        y = str(page.find_all('span', class_='nobr'))
+        n = 0
+        nstring= ''
+        for c in y:
+            if n > 1 or c == r'/':
+                break
+            if c == '>':
+                n+=1
+            if n==1 and c!='>' and c!='<':
+                nstring = nstring+c
         
-            y = str(page.find_all('span', class_='nobr'))
-            n = 0
-            nstring= ''
-            for c in y:
-                if n > 1 or c == r'/':
+        year = nstring.strip().strip(')').strip('(')
+        if(y1 == ''):
+            k_year = 'ignore'
+        
+        nstring = ''
+        n=0
+        d = str(page.find('td', class_="name"))
+        for c in d:
+            if n > 2:
+                break
+            if c == '>':
+                n+=1
+            if n==2 and c!='>' and c!='<':
+                if c == r'/':
                     break
-                if c == '>':
-                    n+=1
-                if n==1 and c!='>' and c!='<':
-                    nstring = nstring+c
+                else:
+                    nstring= nstring+c        
+        d=nstring.strip()
+        n=0
+        if(dir == ''):
+            k_d = 'ignore'
         
-            year = nstring.strip().strip(')').strip('(')
-        else:
-            year = 'ignore'
-        if dir.strip() != '':
-        
-            nstring = ''
-            n=0
-            d = str(page.find('td', class_="name"))
-            for c in d:
-                if n > 2:
-                    break
-                if c == '>':
-                    n+=1
-                if n==2 and c!='>' and c!='<':
-                    if c == r'/':
-                        break
-                    else:
-                        nstring= nstring+c        
-            d=nstring.strip()
-            n=0
-        else:
-            d = 'ignore'
-        
-        if ((year == 'ignore') and ( d == 'ignore')):
+        if ((k_year == 'ignore') and ( k_d == 'ignore')):
             return MovieInfo(url, q1,year,d, 'keep')
-        elif ((year == 'ignore') and ( d == dir)):
+        elif ((k_year == 'ignore') and ( d == dir)) :
             return MovieInfo(url, q1,year,d, 'keep')
-        elif ((year == y1) and (d == 'ignore')):
+        elif ((year == y1) and (k_d == 'ignore')):
             return MovieInfo(url, q1,year,d, 'keep')
     
         if ((year != y1) or (d != dir)):
@@ -156,7 +160,7 @@ class InitialSearch(ab_Controller):
             else:
                 self.movielist.append(thismovie)
         for movie in self.movielist[:]:
-            movie.url= movie.url[:len(url)-12]
+            movie.url= movie.url[:len(url)-11]
             movie.url= movie.url+'reviews'
         return self.movielist
 
