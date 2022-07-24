@@ -33,6 +33,8 @@ class MovieInfo(ab_ProductType_Info):
     def get_keep(self):
         return self.keep
     def get_str(self):
+        if self.title == 'imported':
+            return (self.title + " " + self.url )
         return self.title + " " + self.year + " " + self.director
 
 class MainController(ab_Controller):
