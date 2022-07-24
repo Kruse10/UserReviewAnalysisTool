@@ -113,7 +113,7 @@ class MainWindow(ab_View):
     def initUI(self): 
         self.b1 = qtw.QPushButton(self)
         self.b1.move(180,10)
-        self.b1.resize(150, 50)
+        self.b1.resize(150, 30)
         self.b1.setText("-->")
         self.b1.clicked.connect(self.clicked)
         
@@ -140,23 +140,17 @@ class MainWindow(ab_View):
         self.lb1.move(10,120)
 
         self.b4 = qtw.QPushButton(self)
-        self.b4.resize(150, 50)
-        self.b4.move(180, 65)
+        self.b4.resize(150, 30)
+        self.b4.move(180, 45)
         self.b4.setText("analyze datasets")
         self.b4.clicked.connect(self.analyze_dataset)
 
-    def clicked(self):
-       
-        #links =  self.controller.request_search(self.e1.text())
+        self.dd1 = qtw.QComboBox(self)
+        self.dd1.addItems(['vis1', 'vis2', 'vis3'])
+        self.dd1.resize(150, 30)
+        self.dd1.move(180, 80)
 
-        #next 6 lines prevent duplicate additions
-        #lw_list = []
-        #for x in range(self.lb1.count()):
-            #lw_list.append(self.lb1.item(x).text())
-            
-       # for item in links.url:
-           #if item not in lw_list:
-                #self.lb1.addItem(item)
+    def clicked(self):
         newmovielist = self.controller.request_search(self.e1.text())
         for mov in newmovielist:
             if mov in self.movielist:
@@ -175,10 +169,11 @@ class MainWindow(ab_View):
     def analyze_dataset():
         lw_list = []
         for x in range(self.lb1.count()):
-            lw_list.append(self.lb1.item(x).text())
-        vis = self.controller.gather_data(lw_list) #include vistype and if lw1 unchanged
-        
-        pass
+            lw_list.append(self.lb1.item(x).url)
+        df = self.controller.gather_data(lw_list)
+
+        create_new_plot()
+
 
     def openFile(self):
         

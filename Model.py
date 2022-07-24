@@ -6,6 +6,7 @@ from bs4 import BeautifulSoup
 import nltk
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 from scipy.stats import pearsonr
+from datetime import datetime
 
 class ab_Model(ABC):
     @abstractmethod
@@ -172,7 +173,17 @@ class DataModel(ab_Model):
         pass
 
     def build_report(df):
-        pass
+        reportname = "report"+ datetime.now()+ ".txt"
+        summary = "number of rows = " + df.shape[0] + "\nAverate user rating = " +df['review_score'].mean() +
+            "\nAverage Sentiment score = " + df['sentiment'].mean()
+
+        
+        
+        
+        with open(reportname, 'w')as f:
+
+
+            f.write()
     
 
 
