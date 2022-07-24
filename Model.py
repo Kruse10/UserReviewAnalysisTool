@@ -89,14 +89,15 @@ class ScrapeData(DFBuilder):
 class LoadData(DFBuilder):
     def __init__(self, path):
         self.df = pd.read_csv(path)
+        self.df = self.df.head(1000)
         self.columnlist = ['review_score', 'review_date', 'review_text',
                           'title', 'sentiment', 'sentiment_score', 'score_difference']
     def build_dataset(self, path): 
         
-        for column in new_df.columns:
-            if column not in columnlist:
+        for column in self.df.columns:
+            if column not in self.columnlist:
                 
-                return ["AssignCol", self.new_df.columns]
+                return ["AssignCol", self.df.columns]
             #begin building df and normalizing review scores
             #remove unscored rows
         df = df[df['review_score'].apply(lambda x: isinstance(x, str))]
@@ -163,19 +164,29 @@ class DataModel(ab_Model):
             self.d = ScrapeData()
             self.df.append(d.scrape_reviews(item))
         elif s == "path":
-            self.d = LoadData()
-            returned_df = d.load_dataset(item)
-            if returned_df == "AssignCol":
-                return #unfinished
-            self.df.append(d.load_dataset(item))
+            item = ''.join(item.split())
+            item = item[:-16]
+            item = item[2:]
+            print(item)
+            self.d = LoadData(item)
+            returned_df = self.d.build_dataset(item)
+            if returned_df[0] == "AssignCol":
+                
+                return self.d.df.columns
+            #column names not in column list (remove columns that already have a match)
+            self.df.append(self.d.load_dataset(item))
         
     def visualize_data(self, vistype):
         pass
 
-    def build_report(df):
-        reportname = "report"+ datetime.now()+ ".txt"
-        summary = "number of rows = " + df.shape[0] + "\nAverate user rating = " +df['review_score'].mean() +
-            "\nAverage Sentiment score = " + df['sentiment'].mean()
+    def build_report(self):
+        reportname = ("report-"+ str(datetime.now())+ ".txt")
+        reportname = ''.join(reportname.split())
+        reportname = reportname.replace(":", "")
+        numperiods = reportname.count('.')
+        reportname= reportname.replace('.', "", numperiods - 1)
+        print(reportname)
+        summary = "current in progress string in Jupyter-notebook file"
 
         
         
@@ -183,8 +194,8 @@ class DataModel(ab_Model):
         with open(reportname, 'w')as f:
 
 
-            f.write()
+            f.write(summary)
     
 
 
-        
+       

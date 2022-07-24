@@ -24,11 +24,11 @@ class ab_ProductType_Info(ABC):
 #holds basic movie info and how to output to view 
 class MovieInfo(ab_ProductType_Info):
     def __init__(self, url, t, y, d, k, c):
-        self.url = url
-        self.year = y
-        self.director = d
-        self.title = t
-        self.keep = k
+        self.url = str(url)
+        self.year = str(y)
+        self.director = str(d)
+        self.title = str(t)
+        self.keep = str(k)
        
     def get_keep(self):
         return self.keep
@@ -40,7 +40,10 @@ class MainController(ab_Controller):
         self.model = model
         self.response = None
         self.waiting = False
-    
+
+    def new_load(self, v, url):
+        self.loaddata = LoadData(v, url)
+
     def set_view(self, v):
         self.view = v
 
@@ -52,17 +55,22 @@ class MainController(ab_Controller):
 
     def gather_data(self, l):
         for item in l:
-            if l[item].startswith("http"):
-                self.model.build_df(l[item], "url")
+            if item.url.startswith("http"):
+                self.model.build_df(item, "url")
             else:
-                returnstr = self.model.build_df(list[item], "path")
-                if isinstance(returntype, list):
-                    CheckColumns(self.view).check_columns(model.d.new_df.columns , model.d.new_df.iloc[0])
+                returnstr = self.model.build_df(item.url, "path").tolist()
+                if isinstance(returnstr, list):
+                    CheckColumns(self.view, self).check_columns(self, self.model.d.df.columns , self.model.d.df.iloc[0])
                     
-        self.model.build_report()        
-        return self.model.visualize_data(vistype)            
-    def gather_data(self, l, collist):
-        pass
+        self.model.build_report()
+        self.view.new_vis_window(self.model.d.df) 
+    
+class LoadData(ab_Controller):
+    def __init__(self, v, url):
+       self.parentview = v
+    def create_MovieInfo(self, url):
+        return MovieInfo(url, 'imported', 'imported', 'imported', 'keep', 'imported')
+        
          
 class InitialSearch(ab_Controller):
     def __init__(self):
@@ -70,6 +78,9 @@ class InitialSearch(ab_Controller):
         self.hd = { 'Accept-Language' : 'en-US,en;q=0.5' , 'User-agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101 Firefox/102.0' }
         self.session = HTMLSession()
         self.session.headers.update(self.hd)
+
+    
+
     def getResponse(self, query):
         
         try:
@@ -252,10 +263,11 @@ class InitialSearch(ab_Controller):
         return MovieInfo(url, query,year,d, 'keep', castlist)
 
 class CheckColumns(ab_Controller):
-    def __init__(self, v):
+    def __init__(self, v, c):
         self.view = v
+        self.main_cont = c
     
-    def check_columns(self, titles, row1):
-        self.view.ColWindow(self, titles, row1)
-        pass
+    def check_columns(self, main_cont , titles, row1):
+        self.view.new_col_window( titles, row1)
+        pass #self.main_cont,
                 

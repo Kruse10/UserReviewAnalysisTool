@@ -24,7 +24,7 @@ class ab_View(QMainWindow):
 
 class ColWindow(ab_View):
     def __init__(self, controller ,col_title, row1):
-        super().__init__()
+        super(ab_View, self).__init__()
         self.setGeometry(100, 100, 200, 200)
         self.setWindowTitle("column select")
      #labels of current column titles and dropdowns of expected values  
@@ -36,11 +36,15 @@ class ColWindow(ab_View):
         
 class VisWindow(ab_View):
     __metaclass__ = abcView_Meta
-    def __init__(self):
+    def __init__(self, dataframe, vistype):
         super(ab_View, self).__init__()
+        self.setGeometry(100, 100, 400, 400)
+        self.setWindowTitle(vistype)
+        
 
     def initUI(self):
-        pass
+        self.b1 = qtw.QPushButton()
+        self.b1.move(200, 0)
 
 class ASWindow(ab_View):
     __metaclass__ = abcView_Meta
@@ -49,7 +53,6 @@ class ASWindow(ab_View):
         self.parentwindow = p
         self.controller = c
         self.movielist = []
-        super().__init__()
         self.setGeometry(100, 100, 200, 120)
         self.setWindowTitle("AdvancedSearch")
         self.initUI()
@@ -83,18 +86,21 @@ class ASWindow(ab_View):
 
     def clicked(self):
         newmovielist = self.controller.get_adv_search(self.e1.text(), self.e2.text(), self.e3.text(), self.e4.text())
+        # removes duplicates from newmovielist
         for mov in newmovielist:
-            if mov in self.movielist:
+            if mov in self.parentwindow.movielist:
                 newmovielist.remove(mov)
-
+        
         lw_list = []
         if len(newmovielist) > 0:
-            for x in range(len(self.movielist)):
+            #get the text out of lb1 for each item
+            for x in range(self.parentwindow.lb1.count()):
                 lw_list.append(self.parentwindow.lb1.item(x).text())
-            
+            #add itemtext to lb1, and the item itsself to parents movielist
             for item in newmovielist:
                 if item.get_str() not in lw_list:
                     self.parentwindow.lb1.addItem(item.get_str())
+                    self.parentwindow.movielist.append(item)
        
 class MainWindow(ab_View): 
     __metaclass__ = abcView_Meta
@@ -104,7 +110,10 @@ class MainWindow(ab_View):
         self.setWindowTitle("Dataset Entry")
         self.controller = c
         self.initUI()
+        self.fileName = None
         self.movielist= []
+        self.colwindow = None
+        self.viswindowlist = []
 
     def initUI(self): 
         self.b1 = qtw.QPushButton(self)
@@ -132,7 +141,7 @@ class MainWindow(ab_View):
         self.e1.setPlaceholderText("Query")
 
         self.lb1 = qtw.QListWidget(self)
-        self.lb1.resize(328, 280)
+        self.lb1.resize(328, 260)
         self.lb1.move(10,120)
 
         self.b4 = qtw.QPushButton(self)
@@ -151,7 +160,7 @@ class MainWindow(ab_View):
         for mov in newmovielist:
             if mov in self.movielist:
                 newmovielist.remove(mov)
-
+        self.movielist.append(newmovielist)
         lw_list = []
         if len(newmovielist) > 0:
             for x in range(len(self.movielist)):
@@ -161,26 +170,30 @@ class MainWindow(ab_View):
                 if item.get_str() not in lw_list:
                     self.lb1.addItem(item.get_str())
                     
-    def analyze_dataset():
+    def analyze_dataset(self):
         lw_list = []
-        for x in range(self.lb1.count()):
-            lw_list.append(self.lb1.item(x).url)
+        
+        for x in self.movielist:
+            lw_list.append(x)
         df = self.controller.gather_data(lw_list)
-
-        create_new_plot()
 
     def openFile(self):
         
         options = QFileDialog.Options()
-        options |= QFileDialog.DontUseNativeDialog
-        fileName, _ = QFileDialog.getOpenFileName(self,"QFileDialog.getOpenFileName()", "",".csv (*.csv)", options=options)
+        options = QFileDialog.DontUseNativeDialog
+        self.fileName = QFileDialog.getOpenFileName(self,"QFileDialog.getOpenFileName()", "",".csv (*.csv)", options=options)
         
         #next 6 lines prevent duplicate additions
         lw_list = []
         for x in range(self.lb1.count()):
             lw_list.append(self.lb1.item(x).text())
-        if fileName not in lw_list:
-            self.lb1.addItem(fileName)
+        if self.fileName not in lw_list:
+            self.controller.new_load(self, self.fileName)
+            newitem = self.controller.loaddata.create_MovieInfo(self.fileName)
+
+            self.movielist.append(newitem)
+            self.lb1.addItem(newitem.get_str())
+
             
    
     def advanced_search(self):
@@ -189,6 +202,17 @@ class MainWindow(ab_View):
         pass
 
     def create_new_plot(): pass
+
+    def new_col_window(self, title, row1):
+        self.colwindow= ColWindow(self.controller, title, row1)
+        
+
+    def new_vis_window(self, df):
+        vistype = self.dd1.currentText()
+        #define vistype from dropdown menu
+        self.viswindowlist.append(VisWindow(df,vistype))
+        for window in self.viswindowlist:
+            window.show()
         
 
     
