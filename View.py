@@ -4,6 +4,8 @@ from PyQt5 import QtWidgets as qtw
 from PyQt5.QtWidgets import *
 import sys
 
+import matplotlib.pyplot as plt
+
 def window(self, c):
     app = qtw.QApplication(sys.argv)
         
@@ -38,13 +40,19 @@ class VisWindow(ab_View):
     __metaclass__ = abcView_Meta
     def __init__(self, dataframe, vistype):
         super(ab_View, self).__init__()
+        self.vistype = vistype
+        self.df = dataframe
         self.setGeometry(100, 100, 400, 400)
         self.setWindowTitle(vistype)
         
+    def make_plot():
 
     def initUI(self):
         self.b1 = qtw.QPushButton()
         self.b1.move(200, 0)
+
+
+
 
 class ASWindow(ab_View):
     __metaclass__ = abcView_Meta
@@ -194,14 +202,11 @@ class MainWindow(ab_View):
             self.movielist.append(newitem)
             self.lb1.addItem(newitem.get_str())
 
-            
-   
     def advanced_search(self):
         self.w = ASWindow(self.controller, self)
         self.w.show()
         pass
 
-    def create_new_plot(): pass
 
     def new_col_window(self, title, row1):
         self.colwindow= ColWindow(self.controller, title, row1)
