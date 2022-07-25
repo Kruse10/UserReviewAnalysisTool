@@ -37,52 +37,121 @@ class ScrapeData(DFBuilder):
 
     
     def build_dataset(self, url):
+        response = self.get_response(url)
         
-        #unf
-        self.response = self.get_response(url)
-        
-        self.page = BeautifulSoup(self.response.content, 'html.parser')
-        reviews = page.find_all('div', class_='review-container')
+        anlyz = SentimentIntensityAnalyzer()
+        soup = BeautifulSoup(response.content , 'html.parser')
+        ratings_list = []
         reviews_list = []
         dates_list = []
-
-
-
-        self.df_temp= pd.DataFrame({'score': scores, 
-                          'dates' : dates, 'reviewtexts' : reviewtexts})
-        self.df_temp['movie'] = moviename
-
-        self.df_list.append(df_temp)
-
-        return (str(moviename + str(len(reviews))))
-    
-    def find_date():
+        helpful_list1 = []
+        helpful_list2 = []
+        sentiment_list = []
+        norm_sentiment = []
+        score_difference = []
         
-        reviewdates= (self.page.find_all('span', class_='review-date'))
-        
-        for i in reviewdates:
-            dates_list.append(i.contents[0])
+        #get list of ratings
+        ratings = soup.find_all('div', class_='lister-item-content')
 
-        for r in range(len(dates_list)):
-            print( dates_list[r])
-            print("\n")
-    
-    def find_review_text():
-        reviews= (page.find_all('div', class_='text show-more__control'))
-        #print(reviews)
+        for i in ratings:
+            ratings_list.append(str(i)[442:444].replace("<", ""))
         
+        #get list of review text
+        reviews = soup.find_all('div', class_='text show-more__control')
+
         temp_review = str()
-        
         for i in reviews:
-            r = len(i.contents)
-            for j in range(r):
-                temp_review += (i.contents[j].text)
-            reviews_list.append(temp_review)
-            temp_review = ""
-        return reviews_list
-    #unimplemented
-    def find_title():
-        pass
+            if 'rating-other-user-rating' not in i:
+                r = len(i.contents)
+                for j in range(r):
+                    temp_review += (i.contents[j].text)
+                reviews_list.append(temp_review)
+                temp_review = ""
+
+        #get list of dates
+        review_dates = soup.find_all('span', class_='review-date')
+
+        for i in review_dates:
+            dates_list.append(i.contents[0])
+        for r in range(len(dates_list)):
+            dates_list[r] = str(datetime.strptime(dates_list[r], '%d %B %Y').date())
+
+        # get list of helpfulness rating
+        h_rating = soup.find_all('div', class_='actions text-muted')
+
+        for i in h_rating:
+            helpful_list1.append(i.contents)
+            i= str(i.contents)
+            i= ''.join(i.split())
+            i= i.replace(',','')
+            i= i[4:18]
+            n1 = ''
+            n2 = ''
+            switch = False
+            hitsecondn = False
+
+            for c in i:
+                if c.isnumeric():
+                    if switch == False:
+                        n1 = n1 + c
+                    else:
+                        hitsecondn = True
+                        n2 = n2+c
+                else:
+                    switch = True
+                    if hitsecondn == True:
+                        n3 = n1+ '/' + n2
+                        i = eval(n3)
+                        helpful_list1.append(i)
+
+                        break
+
+        #analyze text
+        for r in range(len(reviews_list)):
+            sentiment_list.append(anlyz.polarity_scores(reviews_list[r])['compound'])
+
+            if (sentiment_list[r] > .1):
+                sentiment_rating.append("pos")
+            elif (sentiment_list[r] < -.1):
+                sentiment_rating.append("neg")
+            else:
+                sentiment_rating.append("neutral")
+    
+    #remove unscored reviews
+        remove = []
+        for i in range(len(ratings_list)):
+            if (ratings_list[i][0].isnumeric()):
+                pass
+            else:
+                remove.append(i)
+        for r in sorted(remove, reverse = True):
+            del ratings_list[r]
+            del reviews_list[r]
+            del dates_list[r]
+            del helpful_list1[r]
+            del sentiment_list[r]
+            del sentiment_rating[r]
+        
+        for i in range(len(ratings_list)):
+            ratings_list[i] = eval(ratings_list[i] + '/10')
+
+        for item in sentiment_list:
+            nitem = (item+1)/2
+            norm_sentiment.append(nitem)
+
+        for r in range(len(ratings_list)):
+            score_difference.append(abs(norm_sentiment[r] - ratings_list[r]))
+        
+        #assemble DataFrame from lists
+        df = pd.DataFrame(dates_list, columns = ['review_date'])
+        df['review_content'] = reviews_list
+        df['review_score'] = ratings_list
+        df['sentiment_score'] = norm_sentiment
+        df['sentiment'] = sentiment_rating
+        df['score_difference'] = score_difference
+
+        return df
+
 
 
 
@@ -90,8 +159,8 @@ class LoadData(DFBuilder):
     def __init__(self, path):
         self.df = pd.read_csv(path)
         self.df = self.df.head(1000)
-        self.columnlist = ['review_score', 'review_date', 'review_text',
-                          'title', 'sentiment', 'sentiment_score', 'score_difference']
+        self.columnlist = ['review_date', 'review_content', 'review_score', 
+                           'sentiment', 'sentiment_score', 'score_difference']
     def build_dataset(self, path): 
         
         for column in self.df.columns:
