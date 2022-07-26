@@ -46,7 +46,7 @@ class VisWindow(ab_View):
         self.setWindowTitle(vistype)
         
     def make_plot():
-
+        pass
     def initUI(self):
         self.b1 = qtw.QPushButton()
         self.b1.move(200, 0)
@@ -168,22 +168,21 @@ class MainWindow(ab_View):
         for mov in newmovielist:
             if mov in self.movielist:
                 newmovielist.remove(mov)
-        self.movielist.append(newmovielist)
+            else:
+                self.movielist.append(mov)
+        
         lw_list = []
         if len(newmovielist) > 0:
             for x in range(len(self.movielist)):
-                lw_list.append(self.lb1.item(x).text())
+                lw_list.append(self.lb1.item(x))
             
             for item in newmovielist:
                 if item.get_str() not in lw_list:
                     self.lb1.addItem(item.get_str())
                     
     def analyze_dataset(self):
-        lw_list = []
         
-        for x in self.movielist:
-            lw_list.append(x)
-        df = self.controller.gather_data(lw_list)
+        df = self.controller.gather_data(self.movielist)
 
     def openFile(self):
         

@@ -231,7 +231,7 @@ class DataModel(ab_Model):
     def build_df(self, item , s):
         if s == "url":
             self.d = ScrapeData()
-            self.df.append(d.scrape_reviews(item))
+            self.df.append(self.d.scrape_reviews(item))
         elif s == "path":
             item = ''.join(item.split())
             item = item[:-16]
