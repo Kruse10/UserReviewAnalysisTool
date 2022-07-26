@@ -65,7 +65,7 @@ class MainController(ab_Controller):
                     CheckColumns(self.view, self).check_columns(self, self.model.d.df.columns , self.model.d.df.iloc[0])
                     
         self.model.build_report()
-        self.view.new_vis_window(self.model.d.df) 
+        self.view.new_vis_window(self.model.df) 
     
 class LoadData(ab_Controller):
     def __init__(self, v, url):

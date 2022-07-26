@@ -37,7 +37,7 @@ class ScrapeData(DFBuilder):
 
     
     def build_dataset(self, url):
-        response = self.get_response(url)
+        response = self.get_response(url.url)
         
         anlyz = SentimentIntensityAnalyzer()
         soup = BeautifulSoup(response.content , 'html.parser')
@@ -47,6 +47,7 @@ class ScrapeData(DFBuilder):
         helpful_list1 = []
         helpful_list2 = []
         sentiment_list = []
+        sentiment_rating = []
         norm_sentiment = []
         score_difference = []
         
@@ -231,7 +232,7 @@ class DataModel(ab_Model):
     def build_df(self, item , s):
         if s == "url":
             self.d = ScrapeData()
-            self.df.append(self.d.scrape_reviews(item))
+            self.df.append(self.d.build_dataset(item))
         elif s == "path":
             item = ''.join(item.split())
             item = item[:-16]
