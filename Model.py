@@ -7,6 +7,8 @@ import nltk
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 from scipy.stats import pearsonr
 from datetime import datetime
+import time
+import random
 
 class ab_Model(ABC):
     @abstractmethod
@@ -29,7 +31,7 @@ class ScrapeData(DFBuilder):
                        , 'User-agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101 Firefox/102.0' }
     def get_response(self, url):
         try:
-            
+            time.sleep(13 - random.randint(0,6))
             response = requests.get(url, headers=self.headers)
             return response
         except requests.exceptions.RequestException as e:

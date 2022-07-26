@@ -94,8 +94,8 @@ class InitialSearch(ab_Controller):
          
     def get_search(self, query):
         original_query = query
-        query = ("https://www.google.com/search?q=" + "imdb" 
-                              + query + "reviews")
+        query = ("https://www.google.com/search?q=" + " imdb " 
+                              + query + " fullcredits")
         self.response = self.getResponse(query)
         self.links = list(self.response.html.absolute_links)
 
