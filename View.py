@@ -1,7 +1,8 @@
 from PyQt5.QtCore import QObject
 from abc import ABC, abstractmethod, ABCMeta
 from PyQt5 import QtWidgets as qtw
-from PyQt5.QtWidgets import *
+from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QListWidget, QListWidgetItem
+
 import sys
 
 import matplotlib.pyplot as plt
@@ -151,6 +152,7 @@ class MainWindow(ab_View):
         self.lb1 = qtw.QListWidget(self)
         self.lb1.resize(328, 260)
         self.lb1.move(10,120)
+        self.lb1.itemClicked.connect(self.item_clicked)
 
         self.b4 = qtw.QPushButton(self)
         self.b4.resize(150, 30)
@@ -163,6 +165,12 @@ class MainWindow(ab_View):
         self.dd1.resize(150, 30)
         self.dd1.move(180, 80)
 
+    def item_clicked(self, item):
+        print(item)
+        del self.movielist[self.lb1.selectedIndexes()[0].row()]
+        print(self.movielist)
+        QListWidget.takeItem(self.lb1, self.lb1.selectedIndexes()[0].row())
+    
     def clicked(self):
         newmovielist = self.controller.request_search(self.e1.text())
         for mov in newmovielist:
@@ -178,7 +186,7 @@ class MainWindow(ab_View):
             
             for item in newmovielist:
                 if item.get_str() not in lw_list:
-                    self.lb1.addItem(item.get_str())
+                    self.lb1.addItem(QListWidgetItem(item.get_str()))
                     
     def analyze_dataset(self):
         
@@ -199,7 +207,7 @@ class MainWindow(ab_View):
             newitem = self.controller.loaddata.create_MovieInfo(self.fileName)
 
             self.movielist.append(newitem)
-            self.lb1.addItem(newitem.get_str())
+            self.lb1.addItem(QListWidgetItem(newitem.get_str()))
 
     def advanced_search(self):
         self.w = ASWindow(self.controller, self)

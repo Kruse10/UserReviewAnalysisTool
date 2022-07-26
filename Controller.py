@@ -4,7 +4,8 @@ from abc import ABC, abstractmethod
 from requests_html import HTML
 from requests_html import HTMLSession
 from bs4 import BeautifulSoup
-
+import time
+import random
 
 class ab_Controller(ABC):
     @abstractmethod
@@ -84,8 +85,9 @@ class InitialSearch(ab_Controller):
     
 
     def getResponse(self, query):
-        
+        time.sleep(8 - random.randint(0,4))
         try:
+            
             response = self.session.get(query, headers = self.hd)
             return response
         except requests.exceptions.RequestException as e:
