@@ -280,8 +280,10 @@ class DataModel(ab_Model):
         numperiods = reportname.count('.')
         reportname= reportname.replace('.', "", numperiods - 1)
         print(reportname)
+
+        scorecorrelation = str(pearsonr(self.df['review_score'], self.df['sentiment_score']))
         summary = "number of rows = " + str(self.df.shape[0]) + "\nAverate user rating = " + str(self.df['review_score'].mean()) +'\nuser rating std deviation ='+ str(np.std(self.df['review_score']))+"\n\nAverage Sentiment score = " + str(self.df['sentiment_score'].mean()) +"\nSentiment score std deviation = " + str(np.std(self.df['sentiment_score'])) +"\n\nAverage score difference = " + str(self.df['score_difference'].mean())+"\nstd deviation in score difference = " + str(np.std(self.df['score_difference']))
-       
+        summary = summary + "\n" + scorecorrelation
         
         
         
