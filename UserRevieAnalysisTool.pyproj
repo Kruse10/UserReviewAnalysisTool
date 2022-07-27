@@ -21,6 +21,9 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="PlotTemplates.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Start.py" />
     <Compile Include="Controller.py">
       <SubType>Code</SubType>

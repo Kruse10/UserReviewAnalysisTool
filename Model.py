@@ -28,7 +28,7 @@ class DFBuilder(ABC):
 class ScrapeData(DFBuilder):
     def __init__(self):
         self.headers = { 'Accept-Language' : 'en-US,en;q=0.5' 
-                       , 'User-agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101 Firefox/102.0' }
+                       , 'User-agent' : 'Mozilla/5.0' }
     def get_response(self, url):
         try:
             time.sleep(13 - random.randint(0,6))
@@ -104,8 +104,8 @@ class ScrapeData(DFBuilder):
                     switch = True
                     if hitsecondn == True:
                         n3 = n1+ '/' + n2
-                        i = eval(n3)
-                        helpful_list1.append(i)
+                        n3 = eval(n3)
+                        helpful_list2.append(n3)
 
                         break
 
@@ -128,10 +128,11 @@ class ScrapeData(DFBuilder):
             else:
                 remove.append(i)
         for r in sorted(remove, reverse = True):
+
             del ratings_list[r]
             del reviews_list[r]
             del dates_list[r]
-            del helpful_list1[r]
+            del helpful_list2[r]
             del sentiment_list[r]
             del sentiment_rating[r]
         
@@ -152,6 +153,8 @@ class ScrapeData(DFBuilder):
         df['sentiment_score'] = norm_sentiment
         df['sentiment'] = sentiment_rating
         df['score_difference'] = score_difference
+
+
 
         return df
 
@@ -227,14 +230,17 @@ class LoadData(DFBuilder):
 class DataModel(ab_Model):
 
     def __init__(self):
-        self.df= pd.DataFrame({'review_score', 
-                          'review_date', 'review_text',
-                          'title', 'sentiment', 'sentiment_score', 'score_difference'})
+        self.df= None
         
     def build_df(self, item , s):
         if s == "url":
             self.d = ScrapeData()
-            self.df.append(self.d.build_dataset(item))
+            df2 =self.d.build_dataset(item)
+            #self.df.append(df2)
+            self.df = pd.concat([self.df, df2], join = 'outer')
+            print(df2)
+            print(self.df)
+            pass
         elif s == "path":
             item = ''.join(item.split())
             item = item[:-16]
@@ -250,6 +256,14 @@ class DataModel(ab_Model):
         
     def visualize_data(self, vistype):
         pass
+    def save_dataframe(self, df):
+        print(df)
+        filename = ("Dataset-"+ str(datetime.now())+ ".txt")
+        filename = ''.join(filename.split())
+        filename = filename.replace(":", "")
+
+        df.to_csv(filename)
+
 
     def build_report(self):
         reportname = ("report-"+ str(datetime.now())+ ".txt")

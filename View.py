@@ -1,11 +1,12 @@
 from PyQt5.QtCore import QObject
 from abc import ABC, abstractmethod, ABCMeta
 from PyQt5 import QtWidgets as qtw
-from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QListWidget, QListWidgetItem
-
+from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QListWidget, QListWidgetItem, QFileDialog
+import PlotTemplates as pt
+import seaborn as sns
 import sys
 
-import matplotlib.pyplot as plt
+
 
 def window(self, c):
     app = qtw.QApplication(sys.argv)
@@ -45,12 +46,23 @@ class VisWindow(ab_View):
         self.df = dataframe
         self.setGeometry(100, 100, 400, 400)
         self.setWindowTitle(vistype)
+        self.initUI()
         
-    def make_plot():
-        pass
+    def make_plot(vistype):
+        if vistype == 'rating/time':
+            return pt.RatingOverTime(self, df)
+        elif vistype == 'user rating/sentiment':
+            return pt.UserRating_Sentiment(self, df)
+            
+    
+
+
     def initUI(self):
-        self.b1 = qtw.QPushButton()
-        self.b1.move(200, 0)
+        self.b1 = qtw.QPushButton(self)
+        self.b1.move(150 , 0)
+
+        self.setCentralWidget(plot)
+
 
 
 
@@ -166,9 +178,9 @@ class MainWindow(ab_View):
         self.dd1.move(180, 80)
 
     def item_clicked(self, item):
-        print(item)
+        #print(item)
         del self.movielist[self.lb1.selectedIndexes()[0].row()]
-        print(self.movielist)
+        #print(self.movielist)
         QListWidget.takeItem(self.lb1, self.lb1.selectedIndexes()[0].row())
     
     def clicked(self):

@@ -64,8 +64,9 @@ class MainController(ab_Controller):
                 returnstr = self.model.build_df(item.url, "path").tolist()
                 if isinstance(returnstr, list):
                     CheckColumns(self.view, self).check_columns(self, self.model.d.df.columns , self.model.d.df.iloc[0])
-                    
+        print(self.model.df)           
         self.model.build_report()
+        self.model.save_dataframe(self.model.df)
         self.view.new_vis_window(self.model.df) 
     
 class LoadData(ab_Controller):
@@ -273,5 +274,5 @@ class CheckColumns(ab_Controller):
     
     def check_columns(self, main_cont , titles, row1):
         self.view.new_col_window( titles, row1)
-        pass #self.main_cont,
+        pass
                 
