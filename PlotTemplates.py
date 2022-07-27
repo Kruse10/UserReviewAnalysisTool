@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import sys
 import numpy
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 
 class RatingOverTime(FigureCanvas):
     def __init__(self,parent, df):

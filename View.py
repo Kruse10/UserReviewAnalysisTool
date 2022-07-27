@@ -1,7 +1,11 @@
 from PyQt5.QtCore import QObject
 from abc import ABC, abstractmethod, ABCMeta
 from PyQt5 import QtWidgets as qtw
-from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QListWidget, QListWidgetItem, QFileDialog
+from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QListWidget, QListWidgetItem, QFileDialog, QDialog, QVBoxLayout
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
+
+import matplotlib.pyplot as plt
 import PlotTemplates as pt
 import seaborn as sns
 import sys
@@ -26,6 +30,7 @@ class ab_View(QMainWindow):
     @abstractmethod
     def initUI(self): pass
 
+
 class ColWindow(ab_View):
     def __init__(self, controller ,col_title, row1):
         super(ab_View, self).__init__()
@@ -38,29 +43,42 @@ class ColWindow(ab_View):
     def assign_cols(new_collist):
         pass
         
-class VisWindow(ab_View):
+class VisWindow(QDialog):
     __metaclass__ = abcView_Meta
     def __init__(self, dataframe, vistype):
-        super(ab_View, self).__init__()
+        super(VisWindow, self).__init__()
         self.vistype = vistype
         self.df = dataframe
-        self.setGeometry(100, 100, 400, 400)
-        self.setWindowTitle(vistype)
-        
-    def make_plot(vistype):
-        if vistype == 'rating/time':
-            return pt.RatingOverTime(self, df)
-        elif vistype == 'user rating/sentiment':
-            return pt.UserRating_Sentiment(self, df)
-            
-    
 
+       
+        pass
+        print(self.df)
+    def make_plot(self, vistype):
+
+        if vistype == 'review length histogram':
+            sns.histplot(self.df['review_length'], bins=15, kde = True)
+        elif vistype == 'user rating/sentiment histogram':
+            sns.histplot(self.df['sentiment_score'], bins=5, kde = True, color = 'red')
+            sns.histplot(self.df['review_score'], bins=5, kde=True, color = 'yellow')
+
+        self.canvas.draw()
 
     def initUI(self):
-        self.b1 = qtw.QPushButton(self)
-        self.b1.move(150 , 0)
+        plt.title 
+        self.figure = plt.figure()
+        self.canvas = FigureCanvas(self.figure)
 
-        self.setCentralWidget(makeplot(vistype))
+        self.toolbar = NavigationToolbar(self.canvas, self)
+        try:
+            layout = QVBoxLayout()
+            layout.addWidget(self.toolbar)
+            layout.addWidget(self.canvas)
+        
+            self.setLayout(layout)
+        except:
+            pass
+        self.make_plot(self.vistype)
+
 
 
 
@@ -134,6 +152,7 @@ class MainWindow(ab_View):
         self.movielist= []
         self.colwindow = None
         self.viswindowlist = []
+        self.dataset_created = False
 
     def initUI(self): 
         self.b1 = qtw.QPushButton(self)
@@ -172,7 +191,7 @@ class MainWindow(ab_View):
         self.b4.clicked.connect(self.analyze_dataset)
 
         self.dd1 = qtw.QComboBox(self)
-        self.dd1.addItems(['vis1', 'vis2', 'vis3'])
+        self.dd1.addItems(['user rating/sentiment histogram', 'review length histogram', 'vis3'])
         self.dd1.resize(150, 30)
         self.dd1.move(180, 80)
 
@@ -189,6 +208,7 @@ class MainWindow(ab_View):
                 newmovielist.remove(mov)
             else:
                 self.movielist.append(mov)
+                self.dataset_created = False
         
         lw_list = []
         if len(newmovielist) > 0:
@@ -200,8 +220,10 @@ class MainWindow(ab_View):
                     self.lb1.addItem(QListWidgetItem(item.get_str()))
                     
     def analyze_dataset(self):
-        
-        df = self.controller.gather_data(self.movielist)
+        if self.dataset_created == False:
+            df = self.controller.gather_data(self.movielist)
+        else:
+            self.new_vis_window(self.controller.get_df())
 
     def openFile(self):
         

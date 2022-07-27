@@ -27,6 +27,7 @@ class DFBuilder(ABC):
 
 class ScrapeData(DFBuilder):
     def __init__(self):
+        
         self.headers = { 'Accept-Language' : 'en-US,en;q=0.5' 
                        , 'User-agent' : 'Mozilla/5.0' }
     def get_response(self, url):
@@ -146,6 +147,10 @@ class ScrapeData(DFBuilder):
         for r in range(len(ratings_list)):
             score_difference.append(abs(norm_sentiment[r] - ratings_list[r]))
         
+        review_length = []
+        for i in reviews_list:
+            review_length.append(len(str(i)))
+
         #assemble DataFrame from lists
         df = pd.DataFrame(dates_list, columns = ['review_date'])
         df['review_content'] = reviews_list
@@ -153,6 +158,9 @@ class ScrapeData(DFBuilder):
         df['sentiment_score'] = norm_sentiment
         df['sentiment'] = sentiment_rating
         df['score_difference'] = score_difference
+        df['review_length'] = review_length
+
+        
 
 
 
@@ -166,7 +174,7 @@ class LoadData(DFBuilder):
         self.df = pd.read_csv(path)
         self.df = self.df.head(1000)
         self.columnlist = ['review_date', 'review_content', 'review_score', 
-                           'sentiment', 'sentiment_score', 'score_difference']
+                           'sentiment', 'sentiment_score', 'score_difference', 'review_length']
     def build_dataset(self, path): 
         
         #for column in self.df.columns:
@@ -197,6 +205,7 @@ class LoadData(DFBuilder):
         self.df["sentiment_score"] = None
         self.df["sentiment"] = None
         self.df["score_difference"]= None
+        self.df["review_length"]= None
         self.df['review_score']
         for (columnName, columnData) in self.df.iteritems():
             if(columnName not in self.columnlist):
@@ -218,7 +227,7 @@ class LoadData(DFBuilder):
             print(row['review_score'])
             
             row['score_difference'] = row['review_score']-row['sentiment_score']
-            print(self.df['sentiment_score'])
+            row['review_length'] = len(str(row['review_content']))
             
                 
         #get correlation, average scores, etc   save to .txt
@@ -263,7 +272,7 @@ class DataModel(ab_Model):
         pass
     def save_dataframe(self, df):
         print(df)
-        filename = ("Dataset-"+ str(datetime.now())+ ".txt")
+        filename = ("Dataset-"+ str(datetime.now())+ ".csv")
         filename = ''.join(filename.split())
         filename = filename.replace(":", "")
 

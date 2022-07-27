@@ -68,7 +68,11 @@ class MainController(ab_Controller):
         self.model.build_report()
         self.model.save_dataframe(self.model.df)
         self.view.new_vis_window(self.model.df) 
-    
+        self.view.dataset_created = True
+
+    def get_df(self):
+        return self.model.df
+
 class LoadData(ab_Controller):
     def __init__(self, v, url):
        self.parentview = v
