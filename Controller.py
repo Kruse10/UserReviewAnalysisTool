@@ -102,11 +102,13 @@ class InitialSearch(ab_Controller):
     def get_search(self, query):
         original_query = query
         query = ("https://www.google.com/search?q=" + " imdb " 
-                              + query + " fullcredits")
+                              + query )
         self.response = self.getResponse(query)
         self.links = list(self.response.html.absolute_links)
-
+        
         for url in self.links[:]:
+            if (url.startswith('https://google.com/url?q=')):
+                url = url[29:]
             if not (url.startswith(self.target)) or not (url.endswith('fullcredits')):
                 self.links.remove(url)
         self.movielist = []

@@ -9,6 +9,7 @@ from datetime import datetime
 import time
 import random
 import numpy as np
+import mechanicalsoup
 
 class ab_Model(ABC):
     @abstractmethod
@@ -30,19 +31,27 @@ class ScrapeData(DFBuilder):
         
         self.headers = { 'Accept-Language' : 'en-US,en;q=0.5' 
                        , 'User-agent' : 'Mozilla/5.0' }
+
     def get_response(self, url):
-        try:
-            time.sleep(13 - random.randint(0,6))
-            response = requests.get(url, headers=self.headers)
-            return response
-        except requests.exceptions.RequestException as e:
-            print(e)
+        
+        self.browser= mechanicalsoup.StatefulBrowser(user_agent='Mozilla/5.0')
+
+        return self.browser.open(url)
+        
+        #try:
+            #time.sleep(13 - random.randint(0,6))
+            #response = requests.get(url, headers=self.headers)
+            #return response
+        #except requests.exceptions.RequestException as e:
+            #print(e)
 
     
     def build_dataset(self, url):
         response = self.get_response(url.url)
-        
+        #button = self.browser.page.find_elements_by_class_name('load-more-trigger')
+        #button.click()
         anlyz = SentimentIntensityAnalyzer()
+
         soup = BeautifulSoup(response.content , 'html.parser')
         ratings_list = []
         reviews_list = []
