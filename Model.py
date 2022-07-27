@@ -3,12 +3,12 @@ import pandas as pd
 import requests
 import bs4
 from bs4 import BeautifulSoup
-import nltk
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 from scipy.stats import pearsonr
 from datetime import datetime
 import time
 import random
+import numpy as np
 
 class ab_Model(ABC):
     @abstractmethod
@@ -109,14 +109,13 @@ class ScrapeData(DFBuilder):
                         helpful_list2.append(n3)
 
                         break
-
         #analyze text
         for r in range(len(reviews_list)):
             sentiment_list.append(anlyz.polarity_scores(reviews_list[r])['compound'])
 
-            if (sentiment_list[r] > .1):
+            if (sentiment_list[r] > 0):
                 sentiment_rating.append("pos")
-            elif (sentiment_list[r] < -.1):
+            elif (sentiment_list[r] <= 0):
                 sentiment_rating.append("neg")
             else:
                 sentiment_rating.append("neutral")
@@ -159,30 +158,16 @@ class ScrapeData(DFBuilder):
         df['sentiment'] = sentiment_rating
         df['score_difference'] = score_difference
         df['review_length'] = review_length
-
-        
-
-
-
         return df
-
-
-
 
 class LoadData(DFBuilder):
     def __init__(self, path):
         self.df = pd.read_csv(path)
-        self.df = self.df.head(1000)
         self.columnlist = ['review_date', 'review_content', 'review_score', 
                            'sentiment', 'sentiment_score', 'score_difference', 'review_length']
     def build_dataset(self, path): 
         
-        #for column in self.df.columns:
-            #if column not in self.columnlist:
-                
-                #return ["AssignCol", self.df.columns]
-            #begin building df and normalizing review scores
-            #remove unscored rows
+        
         self.df = self.df[self.df['review_score'].apply(lambda x: isinstance(x, str))]
         #theres probably a way to do all of these in one...
         lambda_letter_a = lambda x: '1.0' if x.startswith('A') else x
@@ -218,9 +203,9 @@ class LoadData(DFBuilder):
             norm_sentiment = ((sentiment['compound'])+1)/2
             row['sentiment_score'] = norm_sentiment
         
-            if norm_sentiment > .55:
+            if norm_sentiment > .5:
                 row['sentiment'] = 'pos'
-            elif norm_sentiment < .45:
+            elif norm_sentiment <= .5:
                 row['sentiment'] = 'neg'
             else:
                 row['sentiment'] = 'neutral'
@@ -229,7 +214,7 @@ class LoadData(DFBuilder):
             row['score_difference'] = row['review_score']-row['sentiment_score']
             row['review_length'] = len(str(row['review_content']))
             
-                
+
         #get correlation, average scores, etc   save to .txt
         
 
@@ -286,8 +271,8 @@ class DataModel(ab_Model):
         numperiods = reportname.count('.')
         reportname= reportname.replace('.', "", numperiods - 1)
         print(reportname)
-        summary = "current in progress string in Jupyter-notebook file"
-
+        summary = "number of rows = " + str(self.df.shape[0]) + "\nAverate user rating = " + str(self.df['review_score'].mean()) +'\nuser rating std deviation ='+ str(np.std(self.df['review_score']))+"\n\nAverage Sentiment score = " + str(self.df['sentiment_score'].mean()) +"\nSentiment score std deviation = " + str(np.std(self.df['sentiment_score'])) +"\n\nAverage score difference = " + str(self.df['score_difference'].mean())+"\nstd deviation in score difference = " + str(np.std(self.df['score_difference']))
+       
         
         
         

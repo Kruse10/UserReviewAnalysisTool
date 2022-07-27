@@ -66,7 +66,7 @@ class MainController(ab_Controller):
                     #CheckColumns(self.view, self).check_columns(self, self.model.d.df.columns , self.model.d.df.iloc[0])
         print(self.model.df)           
         self.model.build_report()
-        self.model.save_dataframe(self.model.df)
+        #self.model.save_dataframe(self.model.df)
         self.view.new_vis_window(self.model.df) 
         self.view.dataset_created = True
 

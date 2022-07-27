@@ -6,7 +6,6 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 
 import matplotlib.pyplot as plt
-import PlotTemplates as pt
 import seaborn as sns
 import sys
 
@@ -56,11 +55,20 @@ class VisWindow(QDialog):
     def make_plot(self, vistype):
 
         if vistype == 'review length histogram':
-            sns.histplot(self.df['review_length'], bins=15, kde = True)
+            sns.histplot(self.df['review_length'], bins=15, kde = False)
         elif vistype == 'user rating/sentiment histogram':
-            sns.histplot(self.df['sentiment_score'], bins=5, kde = True, color = 'red')
-            sns.histplot(self.df['review_score'], bins=5, kde=True, color = 'yellow')
-
+            sns.histplot(self.df['sentiment_score'], bins=5, kde = False, color = 'red')
+            sns.histplot(self.df['review_score'], bins=5, kde=False, color = 'yellow')
+        elif vistype == 'score difference boxplot':
+            sns.boxplot(x=self.df['sentiment'], y=self.df['score_difference'])
+        elif vistype == 'user rating/sentiment correlation':
+            sns.scatterplot(x='sentiment_score', y= 'review_score', data = self.df)
+        elif vistype == 'review length/sentiment score':
+            sns.lineplot(x='review_length', y='sentiment_score', data=self.df)
+        elif vistype == 'review length/ user score':
+            sns.lineplot(x='review_length', y='review_score', data=self.df)
+        elif vistype == 'review length boxplot':
+            sns.boxplot(x=self.df['sentiment'], y=self.df['review_length'])
         self.canvas.draw()
 
     def initUI(self):
@@ -78,9 +86,6 @@ class VisWindow(QDialog):
         except:
             pass
         self.make_plot(self.vistype)
-
-
-
 
 
 
@@ -191,7 +196,8 @@ class MainWindow(ab_View):
         self.b4.clicked.connect(self.analyze_dataset)
 
         self.dd1 = qtw.QComboBox(self)
-        self.dd1.addItems(['user rating/sentiment histogram', 'review length histogram', 'vis3'])
+        self.dd1.addItems(['user rating/sentiment histogram', 'review length histogram', 'score difference boxplot', 'review length boxplot', 'review length/sentiment score'
+                           ,'review length/ user score', 'user rating/sentiment correlation'])
         self.dd1.resize(150, 30)
         self.dd1.move(180, 80)
 
