@@ -46,7 +46,6 @@ class VisWindow(ab_View):
         self.df = dataframe
         self.setGeometry(100, 100, 400, 400)
         self.setWindowTitle(vistype)
-        self.initUI()
         
     def make_plot(vistype):
         if vistype == 'rating/time':
@@ -61,7 +60,7 @@ class VisWindow(ab_View):
         self.b1 = qtw.QPushButton(self)
         self.b1.move(150 , 0)
 
-        self.setCentralWidget(plot)
+        self.setCentralWidget(makeplot(vistype))
 
 
 
@@ -235,7 +234,9 @@ class MainWindow(ab_View):
         vistype = self.dd1.currentText()
         #define vistype from dropdown menu
         self.viswindowlist.append(VisWindow(df,vistype))
+        
         for window in self.viswindowlist:
+            window.initUI()
             window.show()
         
 
