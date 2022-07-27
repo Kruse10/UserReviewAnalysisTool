@@ -4,7 +4,7 @@ from PyQt5 import QtWidgets as qtw
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QListWidget, QListWidgetItem, QFileDialog, QDialog, QVBoxLayout
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
-
+import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 import sys
@@ -61,8 +61,10 @@ class VisWindow(QDialog):
             sns.histplot(self.df['review_score'], bins=5, kde=False, color = 'yellow')
         elif vistype == 'score difference boxplot':
             sns.boxplot(x=self.df['sentiment'], y=self.df['score_difference'])
-        elif vistype == 'user rating/sentiment correlation':
-            sns.scatterplot(x='sentiment_score', y= 'review_score', data = self.df)
+        elif vistype == 'sentiment/rating scatterplot':
+            sns.scatterplot( 'sentiment_score',  'review_score' , data = self.df, ci = None)
+            #m , b = np.polyfit(self.df['review_score'].flatten(),self.df['sentiment_score'].flatten(), 1)
+            #plt.plot(self.df['review_score'].flatten(), m* self.df['review_score'].flatten() + b, color = 'red')
         elif vistype == 'review length/sentiment score':
             sns.lineplot(x='review_length', y='sentiment_score', data=self.df)
         elif vistype == 'review length/ user score':
@@ -197,7 +199,7 @@ class MainWindow(ab_View):
 
         self.dd1 = qtw.QComboBox(self)
         self.dd1.addItems(['user rating/sentiment histogram', 'review length histogram', 'score difference boxplot', 'review length boxplot', 'review length/sentiment score'
-                           ,'review length/ user score', 'user rating/sentiment correlation'])
+                           ,'reviewlength/score', 'sentiment/rating scatterplot'])
         self.dd1.resize(150, 30)
         self.dd1.move(180, 80)
 

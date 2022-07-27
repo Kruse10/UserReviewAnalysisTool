@@ -123,7 +123,8 @@ class InitialSearch(ab_Controller):
         return self.movielist
 
     def get_adv_search(self, q1, q2, q3, q4):
-        q1 = ("https://www.google.com/search?q=" + "imdb" + q1)
+        originalq1 = q1
+        q1 = ("https://www.google.com/search?q=" + "imdb" + q1 + " fullcredits")
         self.response = self.getResponse(q1)
         self.links = list(self.response.html.absolute_links)
         removed_endings = ["reviews", "critic", "trivia/", "external", "parentalguide"]
@@ -138,7 +139,7 @@ class InitialSearch(ab_Controller):
                 self.links.remove(url)
         self.movielist = []
         for url in self.links[:]:
-            thismovie = self.filter_by(url, q1, q2, q3, q4)
+            thismovie = self.filter_by(url, originalq1, q2, q3, q4)
             if (thismovie.get_keep() != 'keep'):
                 self.links.remove(url)
             else:
@@ -154,6 +155,9 @@ class InitialSearch(ab_Controller):
         page = BeautifulSoup(n_response.content, 'html.parser')
         y = str(page.find_all('span', class_='nobr'))
         n = 0
+        k_d = ''
+        k_year = ''
+        k_q4 = ''
         nstring= ''
         for c in y:
             if n > 1 or c == r'/':
@@ -211,10 +215,10 @@ class InitialSearch(ab_Controller):
         if (q4 == ''):
             k_q4 = 'ignore'
 
-        if (d != dir) or (year != y1) or (q4 not in castlist):
-            return MovieInfo(url, q1,year,d, 'keep', castlist)
+        if ((d != dir) and (k_d != 'ignore')) or ((year != y1) and (k_year != 'ignore')) or ((q4 not in castlist) and (k_q4 != 'ignore')):
+            return MovieInfo(url, q1,year,d, 'ignore', castlist)
         else:
-            return MovieInfo(url, q1, year, 'ignore', castlist)
+            return MovieInfo(url, q1, year, d,'keep', castlist)
         
     def get_info_no_filter(self, url, query):
         
