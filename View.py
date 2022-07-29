@@ -65,7 +65,7 @@ class VisWindow(QDialog):
             sns.scatterplot( 'sentiment_score',  'review_score' , data = self.df, ci = None)
             #m , b = np.polyfit(self.df['review_score'].flatten(),self.df['sentiment_score'].flatten(), 1)
             #plt.plot(self.df['review_score'].flatten(), m* self.df['review_score'].flatten() + b, color = 'red')
-        elif vistype == 'review length/sentiment score':
+        elif vistype == 'reviewlength/score':
             sns.lineplot(x='review_length', y='sentiment_score', data=self.df)
         elif vistype == 'review length/ user score':
             sns.lineplot(x='review_length', y='review_score', data=self.df)
