@@ -60,17 +60,20 @@ class MainController(ab_Controller):
         for item in l:
             if item.url.startswith("http"):
                 self.model.build_df(item, "url")
+                print(self.model.df['review_length'])   
             else:
                 self.model.build_df(item.url, "path")
+                print(self.model.df['review_length'])   
                 #if isinstance(returnstr, list):
                     #CheckColumns(self.view, self).check_columns(self, self.model.d.df.columns , self.model.d.df.iloc[0])
-        print(self.model.df)           
+        #print(self.model.df['review_length'])           
         self.model.build_report()
         #self.model.save_dataframe(self.model.df)
         self.view.new_vis_window(self.model.df) 
         self.view.dataset_created = True
 
     def get_df(self):
+        
         return self.model.df
 
 class LoadData(ab_Controller):

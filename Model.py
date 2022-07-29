@@ -156,8 +156,9 @@ class ScrapeData(DFBuilder):
             score_difference.append(abs(norm_sentiment[r] - ratings_list[r]))
         
         review_length = []
-        for i in reviews_list:
-            review_length.append(len(str(i)))
+       
+        #for i in reviews_list:
+            #review_length.append(len(str(i)))
 
         #assemble DataFrame from lists
         df = pd.DataFrame(dates_list, columns = ['review_date'])
@@ -166,7 +167,11 @@ class ScrapeData(DFBuilder):
         df['sentiment_score'] = norm_sentiment
         df['sentiment'] = sentiment_rating
         df['score_difference'] = score_difference
-        df['review_length'] = review_length
+        df['review_length'] = score_difference
+
+        for index, row in df.iterrows():
+            row['review_length'] = len(str(row['review_content']))
+        
         return df
 
 class LoadData(DFBuilder):
@@ -218,7 +223,7 @@ class LoadData(DFBuilder):
                 row['sentiment'] = 'neg'
             else:
                 row['sentiment'] = 'neutral'
-            print(row['review_score'])
+            #print(row['review_score'])
             
             row['score_difference'] = row['review_score']-row['sentiment_score']
             row['review_length'] = len(str(row['review_content']))
@@ -240,6 +245,7 @@ class DataModel(ab_Model):
         self.df= None
         
     def build_df(self, item , s):
+        print(self.df)
         if s == "url":
             self.d = ScrapeData()
             df2 =self.d.build_dataset(item)
@@ -260,7 +266,7 @@ class DataModel(ab_Model):
                 #return self.d.df.columns
             #column names not in column list (remove columns that already have a match)
             self.df = pd.concat([self.df, df2], join = 'outer')
-            print(self.df)
+            #print(self.df)
         
     def visualize_data(self, vistype):
         pass
