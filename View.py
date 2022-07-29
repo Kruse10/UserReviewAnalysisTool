@@ -204,9 +204,9 @@ class MainWindow(ab_View):
         self.dd1.move(180, 80)
 
     def item_clicked(self, item):
-        #print(item)
+        
         del self.movielist[self.lb1.selectedIndexes()[0].row()]
-        #print(self.movielist)
+        self.dataset_created = False
         QListWidget.takeItem(self.lb1, self.lb1.selectedIndexes()[0].row())
     
     def clicked(self):
@@ -229,7 +229,9 @@ class MainWindow(ab_View):
                     
     def analyze_dataset(self):
         if self.dataset_created == False:
+            self.controller.reset_df()
             df = self.controller.gather_data(self.movielist)
+            self.dataset_created = True
         else:
             self.new_vis_window(self.controller.get_df())
 

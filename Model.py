@@ -243,7 +243,9 @@ class DataModel(ab_Model):
 
     def __init__(self):
         self.df= None
-        
+    
+    def reset_df(self):
+        self.df = None
     def build_df(self, item , s):
         print(self.df)
         if s == "url":

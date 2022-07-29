@@ -43,7 +43,8 @@ class MainController(ab_Controller):
         self.model = model
         self.response = None
         self.waiting = False
-
+    def reset_df(self):
+        self.model.reset_df()
     def new_load(self, v, url):
         self.loaddata = LoadData(v, url)
 
