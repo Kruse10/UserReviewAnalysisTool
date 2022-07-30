@@ -9,7 +9,6 @@ from datetime import datetime
 import time
 import random
 import numpy as np
-import mechanicalsoup
 
 class ab_Model(ABC):
     @abstractmethod
@@ -34,16 +33,14 @@ class ScrapeData(DFBuilder):
 
     def get_response(self, url):
         
-        self.browser= mechanicalsoup.StatefulBrowser(user_agent='Mozilla/5.0')
-
-        return self.browser.open(url)
         
-        #try:
-            #time.sleep(13 - random.randint(0,6))
-            #response = requests.get(url, headers=self.headers)
-            #return response
-        #except requests.exceptions.RequestException as e:
-            #print(e)
+        
+        try:
+            time.sleep(13 - random.randint(0,6))
+            response = requests.get(url, headers=self.headers)
+            return response
+        except requests.exceptions.RequestException as e:
+            print(e)
 
     
     def build_dataset(self, url):
@@ -163,15 +160,16 @@ class ScrapeData(DFBuilder):
         #assemble DataFrame from lists
         df = pd.DataFrame(dates_list, columns = ['review_date'])
         df['review_content'] = reviews_list
+        for review in reviews_list:
+            review_length.append(len(review.split()))
+
         df['review_score'] = ratings_list
         df['sentiment_score'] = norm_sentiment
         df['sentiment'] = sentiment_rating
         df['score_difference'] = score_difference
-        df['review_length'] = score_difference
-
-        for index, row in df.iterrows():
-            row['review_length'] = len(str(row['review_content']))
+        df['review_length'] = review_length
         
+
         return df
 
 class LoadData(DFBuilder):
@@ -247,20 +245,19 @@ class DataModel(ab_Model):
     def reset_df(self):
         self.df = None
     def build_df(self, item , s):
-        print(self.df)
+       
         if s == "url":
             self.d = ScrapeData()
             df2 =self.d.build_dataset(item)
             #self.df.append(df2)
             self.df = pd.concat([self.df, df2], join = 'outer')
-            print(df2)
-            print(self.df)
+            
             pass
         elif s == "path":
             item = ''.join(item.split())
             item = item[:-16]
             item = item[2:]
-            print(item)
+           
             self.d = LoadData(item)
             df2 = self.d.build_dataset(item)
             #if returned_df[0] == "AssignCol":
@@ -273,7 +270,7 @@ class DataModel(ab_Model):
     def visualize_data(self, vistype):
         pass
     def save_dataframe(self, df):
-        print(df)
+        
         filename = ("Dataset-"+ str(datetime.now())+ ".csv")
         filename = ''.join(filename.split())
         filename = filename.replace(":", "")
@@ -287,7 +284,7 @@ class DataModel(ab_Model):
         reportname = reportname.replace(":", "")
         numperiods = reportname.count('.')
         reportname= reportname.replace('.', "", numperiods - 1)
-        print(reportname)
+        
 
         scorecorrelation = str(pearsonr(self.df['review_score'], self.df['sentiment_score']))
         summary = "number of rows = " + str(self.df.shape[0]) + "\nAverate user rating = " + str(self.df['review_score'].mean()) +'\nuser rating std deviation ='+ str(np.std(self.df['review_score']))+"\n\nAverage Sentiment score = " + str(self.df['sentiment_score'].mean()) +"\nSentiment score std deviation = " + str(np.std(self.df['sentiment_score'])) +"\n\nAverage score difference = " + str(self.df['score_difference'].mean())+"\nstd deviation in score difference = " + str(np.std(self.df['score_difference']))
