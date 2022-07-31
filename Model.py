@@ -10,6 +10,11 @@ import time
 import random
 import numpy as np
 
+from selenium import webdriver
+from selenium.webdriver.firefox.options import Options
+import os
+
+
 class ab_Model(ABC):
     @abstractmethod
     def __init__(self): pass
@@ -30,17 +35,24 @@ class ScrapeData(DFBuilder):
         
         self.headers = { 'Accept-Language' : 'en-US,en;q=0.5' 
                        , 'User-agent' : 'Mozilla/5.0' }
-
+        self.Path = r'C:\Program Files (x86)\geckodriver.exe'
+        os.environ['MOZ_HEADLESS'] = '1'
+        self.driver = webdriver.Firefox(executable_path=r"C:\Program Files (x86)\geckodriver.exe")
+        self.driver.implicitly_wait(2)
+        opt = Options()
+        opt.add_argument("User-agent=Mozilla/5.0")
+        
     def get_response(self, url):
         
-        
-        
-        try:
-            time.sleep(13 - random.randint(0,6))
-            response = requests.get(url, headers=self.headers)
-            return response
-        except requests.exceptions.RequestException as e:
-            print(e)
+        self.driver.get(url)
+        return self.driver.page_source
+
+        #try:
+            #time.sleep(13 - random.randint(0,6))
+            #response = requests.get(url, headers=self.headers)
+            #return response
+        #except requests.exceptions.RequestException as e:
+            #print(e)
 
     
     def build_dataset(self, url):
@@ -49,7 +61,7 @@ class ScrapeData(DFBuilder):
         #button.click()
         anlyz = SentimentIntensityAnalyzer()
 
-        soup = BeautifulSoup(response.content , 'html.parser')
+        soup = BeautifulSoup(response, 'html.parser')
         ratings_list = []
         reviews_list = []
         dates_list = []
@@ -68,16 +80,23 @@ class ScrapeData(DFBuilder):
         
         #get list of review text
         reviews = soup.find_all('div', class_='text show-more__control')
-
+        reviews2 = soup.find_all('div', class_='text show-more__control clickable')
+        reviews = reviews + reviews2
         temp_review = str()
         for i in reviews:
+            
+
+            print(i)
+            print('----------------------')
             if 'rating-other-user-rating' not in i:
                 r = len(i.contents)
+            
+
                 for j in range(r):
                     temp_review += (i.contents[j].text)
                 reviews_list.append(temp_review)
                 temp_review = ""
-
+            
         #get list of dates
         review_dates = soup.find_all('span', class_='review-date')
 
@@ -149,7 +168,7 @@ class ScrapeData(DFBuilder):
             nitem = (item+1)/2
             norm_sentiment.append(nitem)
 
-        for r in range(len(ratings_list)):
+        for r in range(len(norm_sentiment)):
             score_difference.append(abs(norm_sentiment[r] - ratings_list[r]))
         
         review_length = []
