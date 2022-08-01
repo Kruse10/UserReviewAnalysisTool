@@ -200,7 +200,7 @@ class ScrapeData(DFBuilder):
         df['sentiment'] = sentiment_rating
         df['score_difference'] = score_difference
         df['review_length'] = review_length
-        
+        print(df['review_score'])
         return df
 
 class LoadData(DFBuilder):

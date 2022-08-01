@@ -50,45 +50,49 @@ class VisWindow(QDialog):
         self.df = dataframe
 
        
-        pass
-        print(self.df)
+       
+        
     def make_plot(self, vistype):
 
         if vistype == 'review length histogram':
             sns.histplot(self.df['review_length'], bins=15, kde = False)
-        elif vistype == 'user rating/sentiment histogram':
-            ax1 = sns.histplot(self.df['sentiment_score'], bins=10, kde = False, color = 'red')
-            ax2 = sns.histplot(self.df['review_score'], bins=10, kde=False, color = 'yellow')
-            ax1.set_xlim(0,1)
-            ax2.set_xlim(0,1)
+            plt.show()
+        elif vistype == 'sentiment histogram':
+            fig, ax = plt.subplots()
+
+            sns.histplot(x= self.df['sentiment_score'],  bins=10, kde = False, color = 'red', ax=ax,
+                        element= "bars").set_xlabel('sentiment score')
+        
+            ax.set_xlim(0,1)
+            plt.show()
+        elif vistype == 'rating histogram':
+            fig, ax = plt.subplots()
+
+            sns.histplot(x= self.df['review_score'],  bins=10, kde = False, color = 'red', ax=ax,
+                        element= "bars").set_xlabel('review score')
+            ax.set_xlim(0,1)
+            plt.show()    
         elif vistype == 'score difference boxplot':
             sns.boxplot(x=self.df['sentiment'], y=self.df['score_difference'])
+            plt.show()
         elif vistype == 'sentiment/rating scatterplot':
             sns.scatterplot( 'sentiment_score',  'review_score' , data = self.df, ci = None)
+            plt.show()
             #m , b = np.polyfit(self.df['review_score'].flatten(),self.df['sentiment_score'].flatten(), 1)
             #plt.plot(self.df['review_score'].flatten(), m* self.df['review_score'].flatten() + b, color = 'red')
         elif vistype == 'reviewlength/score':
             sns.lineplot(x='review_length', y='sentiment_score', data=self.df)
+            plt.show()
         elif vistype == 'review length/ user score':
             sns.lineplot(x='review_length', y='review_score', data=self.df)
+            plt.show()
         elif vistype == 'review length boxplot':
             sns.boxplot(x=self.df['sentiment'], y=self.df['review_length'])
-        self.canvas.draw()
+            plt.show()
+        
 
     def initUI(self):
-        plt.title 
-        self.figure = plt.figure()
-        self.canvas = FigureCanvas(self.figure)
-
-        self.toolbar = NavigationToolbar(self.canvas, self)
-        try:
-            layout = QVBoxLayout()
-            layout.addWidget(self.toolbar)
-            layout.addWidget(self.canvas)
         
-            self.setLayout(layout)
-        except:
-            pass
         self.make_plot(self.vistype)
 
 
@@ -200,7 +204,8 @@ class MainWindow(ab_View):
         self.b4.clicked.connect(self.analyze_dataset)
 
         self.dd1 = qtw.QComboBox(self)
-        self.dd1.addItems(['user rating/sentiment histogram', 'review length histogram', 'score difference boxplot', 'review length boxplot', 'review length/sentiment score'
+        self.dd1.addItems(['review length histogram', 'score difference boxplot', 'review length boxplot'
+                           , 'rating histogram', 'sentiment histogram'
                            ,'reviewlength/score', 'sentiment/rating scatterplot'])
         self.dd1.resize(150, 30)
         self.dd1.move(180, 80)
@@ -267,11 +272,11 @@ class MainWindow(ab_View):
     def new_vis_window(self, df):
         vistype = self.dd1.currentText()
         #define vistype from dropdown menu
-        self.viswindowlist.append(VisWindow(df,vistype))
+        VisWindow(df,vistype).make_plot(vistype)
         
-        for window in self.viswindowlist:
-            window.initUI()
-            window.show()
+        #for window in self.viswindowlist:
+            #window.initUI()
+            #window.show()
         
 
     

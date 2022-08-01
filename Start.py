@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QApplication, QWidget as qa
+
 import Model
 import View
 import Controller
