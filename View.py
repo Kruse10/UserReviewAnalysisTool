@@ -57,8 +57,10 @@ class VisWindow(QDialog):
         if vistype == 'review length histogram':
             sns.histplot(self.df['review_length'], bins=15, kde = False)
         elif vistype == 'user rating/sentiment histogram':
-            sns.histplot(self.df['sentiment_score'], bins=5, kde = False, color = 'red')
-            sns.histplot(self.df['review_score'], bins=5, kde=False, color = 'yellow')
+            ax1 = sns.histplot(self.df['sentiment_score'], bins=10, kde = False, color = 'red')
+            ax2 = sns.histplot(self.df['review_score'], bins=10, kde=False, color = 'yellow')
+            ax1.set_xlim(0,1)
+            ax2.set_xlim(0,1)
         elif vistype == 'score difference boxplot':
             sns.boxplot(x=self.df['sentiment'], y=self.df['score_difference'])
         elif vistype == 'sentiment/rating scatterplot':

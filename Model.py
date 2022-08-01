@@ -12,6 +12,7 @@ import numpy as np
 
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
+from selenium.webdriver.common.by import By
 import os
 
 
@@ -45,6 +46,16 @@ class ScrapeData(DFBuilder):
     def get_response(self, url):
         
         self.driver.get(url)
+        for n in range(10):
+
+            try:
+            
+                load_button = self.driver.find_element(By.ID,"load-more-trigger")
+                load_button.click()
+                print("clicked")
+                time.sleep(5)
+            except  :
+                print('couldnt find button')
         return self.driver.page_source
 
         #try:
@@ -79,9 +90,8 @@ class ScrapeData(DFBuilder):
             ratings_list.append(str(i)[442:444].replace("<", ""))
         
         #get list of review text
-        reviews = soup.find_all('div', class_='text show-more__control')
-        reviews2 = soup.find_all('div', class_='text show-more__control clickable')
-        reviews = reviews + reviews2
+        reviews = soup.find_all('div', class_=['text show-more__control', 'text show-more__control clickable'])
+        
         temp_review = str()
         for i in reviews:
             
@@ -130,7 +140,10 @@ class ScrapeData(DFBuilder):
                     switch = True
                     if hitsecondn == True:
                         n3 = n1+ '/' + n2
-                        n3 = eval(n3)
+                        try: 
+                            n3 = eval(n3)
+                        except:
+                            n3 = 0
                         helpful_list2.append(n3)
 
                         break
@@ -188,7 +201,6 @@ class ScrapeData(DFBuilder):
         df['score_difference'] = score_difference
         df['review_length'] = review_length
         
-
         return df
 
 class LoadData(DFBuilder):
