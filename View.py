@@ -10,7 +10,7 @@ import seaborn as sns
 import sys
 
 
-
+#used only by start.py for initial startup
 def window(self, c):
     app = qtw.QApplication(sys.argv)
         
@@ -29,7 +29,7 @@ class ab_View(QMainWindow):
     @abstractmethod
     def initUI(self): pass
 
-
+#currently not fully implemented, not currently used
 class ColWindow(ab_View):
     def __init__(self, controller ,col_title, row1):
         super(ab_View, self).__init__()
@@ -41,7 +41,9 @@ class ColWindow(ab_View):
     
     def assign_cols(new_collist):
         pass
-        
+
+
+#holds and creates plots        
 class VisWindow(QDialog):
     __metaclass__ = abcView_Meta
     def __init__(self, dataframe, vistype):
@@ -49,54 +51,54 @@ class VisWindow(QDialog):
         self.vistype = vistype
         self.df = dataframe
 
-       
-       
-        
+        print(self.df)
+
+    #creates plot for given visualisation template
     def make_plot(self, vistype):
 
         if vistype == 'review length histogram':
             sns.histplot(self.df['review_length'], bins=15, kde = False)
-            plt.show()
-        elif vistype == 'sentiment histogram':
-            fig, ax = plt.subplots()
-
-            sns.histplot(x= self.df['sentiment_score'],  bins=10, kde = False, color = 'red', ax=ax,
-                        element= "bars").set_xlabel('sentiment score')
-        
-            ax.set_xlim(0,1)
-            plt.show()
-        elif vistype == 'rating histogram':
-            fig, ax = plt.subplots()
-
-            sns.histplot(x= self.df['review_score'],  bins=10, kde = False, color = 'red', ax=ax,
-                        element= "bars").set_xlabel('review score')
-            ax.set_xlim(0,1)
-            plt.show()    
+        elif vistype == 'user sentiment histogram':
+            ax1 = sns.histplot(self.df['sentiment_score'], bins=10, kde = False, color = 'red')
+            
+            ax1.set_xlim(0,1)
+        elif vistype == 'user rating histogram':
+            
+            ax1 = sns.histplot(self.df['review_score'], bins=10, kde=False, color = 'yellow')
+            ax1.set_xlim(0,1)
+            
         elif vistype == 'score difference boxplot':
             sns.boxplot(x=self.df['sentiment'], y=self.df['score_difference'])
-            plt.show()
         elif vistype == 'sentiment/rating scatterplot':
             sns.scatterplot( 'sentiment_score',  'review_score' , data = self.df, ci = None)
-            plt.show()
             #m , b = np.polyfit(self.df['review_score'].flatten(),self.df['sentiment_score'].flatten(), 1)
             #plt.plot(self.df['review_score'].flatten(), m* self.df['review_score'].flatten() + b, color = 'red')
         elif vistype == 'reviewlength/score':
             sns.lineplot(x='review_length', y='sentiment_score', data=self.df)
-            plt.show()
         elif vistype == 'review length/ user score':
             sns.lineplot(x='review_length', y='review_score', data=self.df)
-            plt.show()
         elif vistype == 'review length boxplot':
             sns.boxplot(x=self.df['sentiment'], y=self.df['review_length'])
-            plt.show()
-        
+        self.canvas.draw()
 
     def initUI(self):
+        plt.title 
+        self.figure = plt.figure()
+        self.canvas = FigureCanvas(self.figure)
+
+        self.toolbar = NavigationToolbar(self.canvas, self)
+        try:
+            layout = QVBoxLayout()
+            layout.addWidget(self.toolbar)
+            layout.addWidget(self.canvas)
         
+            self.setLayout(layout)
+        except:
+            pass
         self.make_plot(self.vistype)
 
 
-
+#window for Advanced search
 class ASWindow(ab_View):
     __metaclass__ = abcView_Meta
     def __init__(self, c, p):
@@ -108,7 +110,7 @@ class ASWindow(ab_View):
         self.setWindowTitle("AdvancedSearch")
         self.initUI()
     
-
+    #creates UI elements
     def initUI(self):
         self.e1 = qtw.QLineEdit(self)
         self.e1.setMaxLength(20)
@@ -134,7 +136,7 @@ class ASWindow(ab_View):
         self.b1.setText("-->")
         self.b1.clicked.connect(self.clicked)
 
-
+    #called when search button clicked, attempts to add new item to listbox on main window
     def clicked(self):
         newmovielist = self.controller.get_adv_search(self.e1.text(), self.e2.text(), self.e3.text(), self.e4.text())
         # removes duplicates from newmovielist
@@ -150,9 +152,10 @@ class ASWindow(ab_View):
             #add itemtext to lb1, and the item itsself to parents movielist
             for item in newmovielist:
                 if item.get_str() not in lw_list:
+                    self.parentwindow.dataset_created = False
                     self.parentwindow.lb1.addItem(item.get_str())
                     self.parentwindow.movielist.append(item)
-       
+#main window       
 class MainWindow(ab_View): 
     __metaclass__ = abcView_Meta
     def __init__(self, c):
@@ -167,6 +170,7 @@ class MainWindow(ab_View):
         self.viswindowlist = []
         self.dataset_created = False
 
+    #creates UI elements
     def initUI(self): 
         self.b1 = qtw.QPushButton(self)
         self.b1.move(180,10)
@@ -204,18 +208,19 @@ class MainWindow(ab_View):
         self.b4.clicked.connect(self.analyze_dataset)
 
         self.dd1 = qtw.QComboBox(self)
-        self.dd1.addItems(['review length histogram', 'score difference boxplot', 'review length boxplot'
-                           , 'rating histogram', 'sentiment histogram'
+        self.dd1.addItems(['user sentiment histogram', 'user rating histogram',
+                          'review length histogram', 'score difference boxplot', 'review length boxplot', 'review length/sentiment score'
                            ,'reviewlength/score', 'sentiment/rating scatterplot'])
         self.dd1.resize(150, 30)
         self.dd1.move(180, 80)
 
+    #deletes Item from List
     def item_clicked(self, item):
         
         del self.movielist[self.lb1.selectedIndexes()[0].row()]
         self.dataset_created = False
         QListWidget.takeItem(self.lb1, self.lb1.selectedIndexes()[0].row())
-    
+    #attempts to add new items to list box
     def clicked(self):
         newmovielist = self.controller.request_search(self.e1.text())
         for mov in newmovielist:
@@ -233,7 +238,9 @@ class MainWindow(ab_View):
             for item in newmovielist:
                 if item.get_str() not in lw_list:
                     self.lb1.addItem(QListWidgetItem(item.get_str()))
-                    
+
+    #tells controller to create dataset from items in list box
+    #or if list unchanged to create a new visualization                
     def analyze_dataset(self):
         if self.dataset_created == False:
             self.controller.reset_df()
@@ -242,6 +249,7 @@ class MainWindow(ab_View):
         else:
             self.new_vis_window(self.controller.get_df())
 
+    #creates File dialog
     def openFile(self):
         
         options = QFileDialog.Options()
@@ -255,28 +263,33 @@ class MainWindow(ab_View):
         if self.fileName not in lw_list:
             self.controller.new_load(self, self.fileName)
             newitem = self.controller.loaddata.create_MovieInfo(self.fileName)
-
+            self.dataset_created = False
             self.movielist.append(newitem)
             self.lb1.addItem(QListWidgetItem(newitem.get_str()))
-
+    
+    #creates advanced search window
     def advanced_search(self):
         self.w = ASWindow(self.controller, self)
         self.w.show()
         pass
 
-
+    #not currently implemented
     def new_col_window(self, title, row1):
         self.colwindow= ColWindow(self.controller, title, row1)
         
-
+    #creates new plot and window
     def new_vis_window(self, df):
         vistype = self.dd1.currentText()
-        #define vistype from dropdown menu
-        VisWindow(df,vistype).make_plot(vistype)
-        
-        #for window in self.viswindowlist:
-            #window.initUI()
-            #window.show()
+        #define vistype from dropdown menu 
+        try:
+            self.viswindowlist.pop()
+        except:
+            print("No Item to remove from viswindowlist")
+        self.viswindowlist.append(VisWindow(df,vistype))
+        for window in self.viswindowlist:
+            window.initUI()
+            window.show()
+
         
 
     

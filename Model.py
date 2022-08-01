@@ -42,30 +42,26 @@ class ScrapeData(DFBuilder):
         self.driver.implicitly_wait(2)
         opt = Options()
         opt.add_argument("User-agent=Mozilla/5.0")
-        
+    
+    #Launches webdriver, Loads more reviews and returns the page source    
     def get_response(self, url):
         
         self.driver.get(url)
-        for n in range(10):
-
+        #for loop intended for just the demo, Use while loop to get full search results
+        for n in range(3):
+        #Gets all search results
+        #load_button = "dummy value"
+        #while (load_button != None):
             try:
-            
                 load_button = self.driver.find_element(By.ID,"load-more-trigger")
                 load_button.click()
-                print("clicked")
+                print("clicked load more button")
                 time.sleep(5)
             except  :
                 print('couldnt find button')
         return self.driver.page_source
 
-        #try:
-            #time.sleep(13 - random.randint(0,6))
-            #response = requests.get(url, headers=self.headers)
-            #return response
-        #except requests.exceptions.RequestException as e:
-            #print(e)
-
-    
+    #handles creating Dataframe for given review page
     def build_dataset(self, url):
         response = self.get_response(url.url)
         #button = self.browser.page.find_elements_by_class_name('load-more-trigger')
@@ -93,11 +89,9 @@ class ScrapeData(DFBuilder):
         reviews = soup.find_all('div', class_=['text show-more__control', 'text show-more__control clickable'])
         
         temp_review = str()
+        
         for i in reviews:
             
-
-            print(i)
-            print('----------------------')
             if 'rating-other-user-rating' not in i:
                 r = len(i.contents)
             
@@ -200,7 +194,7 @@ class ScrapeData(DFBuilder):
         df['sentiment'] = sentiment_rating
         df['score_difference'] = score_difference
         df['review_length'] = review_length
-        print(df['review_score'])
+        
         return df
 
 class LoadData(DFBuilder):
@@ -208,8 +202,8 @@ class LoadData(DFBuilder):
         self.df = pd.read_csv(path)
         self.columnlist = ['review_date', 'review_content', 'review_score', 
                            'sentiment', 'sentiment_score', 'score_difference', 'review_length']
+    #build Dataframe from given file path
     def build_dataset(self, path): 
-        
         
         self.df = self.df[self.df['review_score'].apply(lambda x: isinstance(x, str))]
         #theres probably a way to do all of these in one...
@@ -275,6 +269,8 @@ class DataModel(ab_Model):
     
     def reset_df(self):
         self.df = None
+
+        #passes item to appropriate build_dataset method
     def build_df(self, item , s):
        
         if s == "url":
@@ -291,15 +287,10 @@ class DataModel(ab_Model):
            
             self.d = LoadData(item)
             df2 = self.d.build_dataset(item)
-            #if returned_df[0] == "AssignCol":
-                
-                #return self.d.df.columns
-            #column names not in column list (remove columns that already have a match)
+
             self.df = pd.concat([self.df, df2], join = 'outer')
-            #print(self.df)
-        
-    def visualize_data(self, vistype):
-        pass
+           
+    #currently not called anywhere
     def save_dataframe(self, df):
         
         filename = ("Dataset-"+ str(datetime.now())+ ".csv")
@@ -319,7 +310,7 @@ class DataModel(ab_Model):
 
         scorecorrelation = str(pearsonr(self.df['review_score'], self.df['sentiment_score']))
         summary = "number of rows = " + str(self.df.shape[0]) + "\nAverate user rating = " + str(self.df['review_score'].mean()) +'\nuser rating std deviation ='+ str(np.std(self.df['review_score']))+"\n\nAverage Sentiment score = " + str(self.df['sentiment_score'].mean()) +"\nSentiment score std deviation = " + str(np.std(self.df['sentiment_score'])) +"\n\nAverage score difference = " + str(self.df['score_difference'].mean())+"\nstd deviation in score difference = " + str(np.std(self.df['score_difference']))
-        summary = summary + "\n" + scorecorrelation
+        summary = summary + "\n Correlation and P-Value" + scorecorrelation
         
         
         

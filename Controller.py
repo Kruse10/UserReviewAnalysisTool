@@ -38,6 +38,7 @@ class MovieInfo(ab_ProductType_Info):
             return (self.title + " " + self.url )
         return self.title + " " + self.year + " " + self.director
 
+    #determines what instructions to tell model, and creates secondary controllers 
 class MainController(ab_Controller):
     def __init__(self, model):
         self.model = model
@@ -77,13 +78,14 @@ class MainController(ab_Controller):
         
         return self.model.df
 
+    #Controller sets up information on naming for movieInfo object to give to View
 class LoadData(ab_Controller):
     def __init__(self, v, url):
        self.parentview = v
     def create_MovieInfo(self, url):
         return MovieInfo(url, 'imported', 'imported', 'imported', 'keep', 'imported')
         
-         
+    #Controller sets up information on naming for MovieInfo object to give to the view     
 class InitialSearch(ab_Controller):
     def __init__(self):
         self.target ='https://www.imdb.com/title'
@@ -92,9 +94,9 @@ class InitialSearch(ab_Controller):
         self.session.headers.update(self.hd)
 
     
-
+    #gets response from page
     def getResponse(self, query):
-        time.sleep(8 - random.randint(0,4))
+        time.sleep(7 - random.randint(0,4))
         try:
             
             response = self.session.get(query, headers = self.hd)
@@ -102,7 +104,7 @@ class InitialSearch(ab_Controller):
         except requests.exceptions.RequestException as e:
             print(e)
 
-         
+    #gets initial search results     
     def get_search(self, query):
         original_query = query
         query = ("https://www.google.com/search?q=" + " imdb " 
@@ -128,6 +130,7 @@ class InitialSearch(ab_Controller):
             movie.url= movie.url+'reviews'
         return self.movielist
 
+    # gets initial search results and filters out those that are not matching
     def get_adv_search(self, q1, q2, q3, q4):
         originalq1 = q1
         q1 = ("https://www.google.com/search?q=" + "imdb" + q1 + " fullcredits")
@@ -154,7 +157,8 @@ class InitialSearch(ab_Controller):
             movie.url= movie.url[:len(url)-11]
             movie.url= movie.url+'reviews'
         return self.movielist
-        
+    
+    #Gets info and Filters out results that do not match criteria
     def filter_by(self, url, q1, dir, y1, q4):
         
         n_response = requests.get(url, headers=self.hd)
@@ -225,7 +229,7 @@ class InitialSearch(ab_Controller):
             return MovieInfo(url, q1,year,d, 'ignore', castlist)
         else:
             return MovieInfo(url, q1, year, d,'keep', castlist)
-        
+    #gets movie Information    
     def get_info_no_filter(self, url, query):
         
         hd =  {'Accept-Language' : 'en-US,en;q=0.5' , 'User-agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101 Firefox/102.0' }
@@ -281,6 +285,8 @@ class InitialSearch(ab_Controller):
             castlist.append(nstring)        
         return MovieInfo(url, query,year,d, 'keep', castlist)
 
+
+#Not currently implemented or called
 class CheckColumns(ab_Controller):
     def __init__(self, v, c):
         self.view = v
